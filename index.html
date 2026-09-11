@@ -478,6 +478,24 @@
     state.data = fillDefaults(raw ? JSON.parse(raw) : seedData());
     state.locked = computeLocked();
 
+    // Always try the publicly deployed data.json first (no auth needed — the repo is
+    // public, so this file is readable by anyone). This is what makes the password
+    // gate apply to every visitor, not only devices that already have a token.
+    fetch("./" + GH_PATH, { cache: "no-store" }).then(function(res){
+      if (!res.ok) throw new Error("no public data yet");
+      return res.json();
+    }).then(function(publicData){
+      state.data = fillDefaults(publicData);
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data)); } catch(e){}
+      state.locked = computeLocked();
+    }).catch(function(){
+      // first run, not deployed yet, or offline — fall back to local/seed data already set above
+    }).then(function(){
+      continueLoadWithToken();
+    });
+  }
+
+  function continueLoadWithToken(){
     if (!state.ghToken){
       state.loading = false; render(); return;
     }

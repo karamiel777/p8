@@ -145,14 +145,25 @@
   .chip button { background: none; border: none; color: var(--muted); cursor: pointer; display: flex; padding: 2px; }
   .chip button:hover { color: var(--wine); }
 
+  .mobile-topbar { display: none; }
+
   @media (max-width: 860px) {
     .app { flex-direction: column; }
-    .sidebar { width: 100%; flex-direction: row; align-items: center; padding: 14px 16px; flex-wrap: wrap; }
-    .brand { border-bottom: none; padding: 0 10px 0 0; margin-bottom: 0; border-right: 1px solid var(--line); margin-right: 8px; }
-    .nav { flex-direction: row; overflow-x: auto; }
-    .lang-switch { width: 90px; margin-bottom: 0; margin-left: auto; }
-    .sidebar-foot { display: none; }
-    .content { padding: 22px; }
+    .mobile-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 18px; background: var(--card); border-bottom: 1px solid var(--line);
+      position: sticky; top: 0; z-index: 40;
+    }
+    .mobile-topbar .mark { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 18px; font-weight: 600; }
+    .hamburger-btn { background: none; border: 1px solid var(--line); border-radius: 6px; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; color: var(--ink); flex-shrink: 0; }
+    .sidebar {
+      position: fixed; top: 0; bottom: 0; left: 0; width: 260px; max-width: 82vw;
+      transform: translateX(-100%); transition: transform 0.22s ease; z-index: 61;
+      box-shadow: 2px 0 24px rgba(0,0,0,0.18); overflow-y: auto;
+    }
+    .sidebar.open { transform: translateX(0); }
+    .sidebar-scrim { position: fixed; inset: 0; background: rgba(33,31,28,0.4); z-index: 60; }
+    .content { padding: 20px; }
     .two-col { grid-template-columns: 1fr; }
     .form-grid { grid-template-columns: 1fr; }
   }
@@ -334,6 +345,7 @@
   function trCategory(c){ var key = "cat_"+c.replace(/[^A-Za-z]/g,""); var d = T[state.lang]||T.fr; return d[key]!==undefined ? d[key] : c; }
 
   var ICONS = {
+    hamburger: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M3 12h18M3 18h18"/></svg>',
     dashboard: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>',
     calendar: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/><path d="M8 2v4"/><path d="M16 2v4"/></svg>',
     stays: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg>',
@@ -404,6 +416,7 @@
     expensesMonth: todayISO().slice(0,7),
     modal: null,
     confirmAction: null,
+    mobileMenuOpen: false,
     ghToken: (function(){ try { return localStorage.getItem(GH_TOKEN_KEY) || ""; } catch(e){ return ""; } })(),
     ghOwner: (function(){ try { return localStorage.getItem(GH_OWNER_KEY) || GH_OWNER_DEFAULT; } catch(e){ return GH_OWNER_DEFAULT; } })(),
     ghRepo: (function(){ try { return localStorage.getItem(GH_REPO_KEY) || GH_REPO_DEFAULT; } catch(e){ return GH_REPO_DEFAULT; } })(),
@@ -593,6 +606,19 @@
 
   var root = document.getElementById("root");
 
+  function showErrorBanner(msg){
+    var el = document.getElementById("crashBanner");
+    if (!el){
+      el = document.createElement("div");
+      el.id = "crashBanner";
+      el.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:9999;background:#7A3B3B;color:#fff;padding:12px 16px;font:12px/1.5 monospace;white-space:pre-wrap;word-break:break-word;";
+      document.body.appendChild(el);
+    }
+    el.textContent = "Erreur technique (fais une capture d'écran de ce message) : " + msg;
+  }
+  window.addEventListener("error", function(e){ showErrorBanner(e.message + " (" + e.filename + ":" + e.lineno + ")"); });
+  window.addEventListener("unhandledrejection", function(e){ showErrorBanner("Promise: " + (e.reason && e.reason.message ? e.reason.message : e.reason)); });
+
 
   function render(){
     if (state.loading || !state.data){
@@ -628,8 +654,13 @@
     var banner = hasDemo ? '<div class="demo-banner"><span>'+tr("demoBanner")+'</span><button class="btn small subtle" data-action="clear-demo">'+tr("removeDemoData")+'</button></div>' : "";
 
     root.innerHTML =
+      '<div class="mobile-topbar"><button class="hamburger-btn" data-action="toggle-menu">'+ICONS.hamburger+'</button>' +
+        '<div class="mark">'+esc(d.residence.name)+'</div>' +
+        '<span class="sync-dot '+syncDotClass()+'" title="'+syncStatusText()+'"></span>' +
+      '</div>' +
       '<div class="app">' +
-        '<aside class="sidebar">' +
+        (state.mobileMenuOpen ? '<div class="sidebar-scrim" data-action="toggle-menu"></div>' : '') +
+        '<aside class="sidebar'+(state.mobileMenuOpen?' open':'')+'">' +
           '<div class="brand"><div class="mark">'+esc(d.residence.name)+'</div><div class="sub">'+esc((d.residence.subtitle||"").toUpperCase())+'</div></div>' +
           '<nav class="nav">' + navHTML + '</nav>' +
           '<div class="lang-switch"><button class="'+(state.lang==="fr"?"active":"")+'" data-action="lang" data-lang="fr">FR</button><button class="'+(state.lang==="en"?"active":"")+'" data-action="lang" data-lang="en">EN</button></div>' +
@@ -1057,7 +1088,8 @@
     var action = el.getAttribute("data-action");
     var id = el.getAttribute("data-id");
 
-    if (action==="tab"){ state.tab = el.getAttribute("data-tab"); state.selectedDay=null; render(); }
+    if (action==="tab"){ state.tab = el.getAttribute("data-tab"); state.selectedDay=null; state.mobileMenuOpen=false; render(); }
+    else if (action==="toggle-menu"){ state.mobileMenuOpen = !state.mobileMenuOpen; render(); }
     else if (action==="lang"){ state.lang = el.getAttribute("data-lang"); saveLang(); render(); }
     else if (action==="save-now"){ doRemoteSave(); }
     else if (action==="gh-connect"){
@@ -1186,6 +1218,10 @@
       if (cat && d.categories.indexOf(cat)===-1) update({ categories: d.categories.concat([cat]) });
       form.reset();
     }
+  });
+
+  window.addEventListener("pageshow", function(e){
+    if (e.persisted){ window.location.reload(); }
   });
 
   loadData();

@@ -172,10 +172,10 @@
   }
 
   @media print {
-    body * { visibility: hidden; }
-    #reportPrintArea, #reportPrintArea * { visibility: visible; }
-    #reportPrintArea { position: absolute; left: 0; top: 0; width: 100%; padding: 20px; }
-    .no-print { display: none !important; }
+    .sidebar, .mobile-topbar, .sidebar-scrim, .demo-banner, .no-print { display: none !important; }
+    .app { display: block !important; }
+    .content { padding: 0 !important; max-width: 100% !important; }
+    .table-wrap { border: 1px solid #ccc !important; }
   }
 </style>
 </head>
@@ -759,6 +759,7 @@
 
   function statCard(label, value){ return '<div class="stat-card"><div class="stat-value">'+value+'</div><div class="stat-label">'+esc(label)+'</div></div>'; }
   function rowLine(left,right,tag){ return '<div class="row"><span>'+left+(tag?' <span class="tag">'+tag+'</span>':'')+'</span><span>'+right+'</span></div>'; }
+  function printButtonHTML(){ return '<button class="btn secondary no-print" data-action="print-page">'+ICONS.print+' '+tr("printExport")+'</button>'; }
 
   function computeMonthStats(d, monthKey){
     var parts = monthKey.split("-"); var y = Number(parts[0]), m = Number(parts[1]);
@@ -808,7 +809,7 @@
       return rowLine(esc(it.name), it.quantity+' / '+it.threshold+(it.unit?' '+esc(it.unit):''));
     }).join("") : '<p class="empty">'+tr("noToBuy")+'</p>';
 
-    return '<div class="page-head"><div><h1 class="page-title">'+tr("dash_title")+'</h1><p class="page-sub">'+fmtDate(todayISO())+'</p></div></div>' +
+    return '<div class="page-head"><div><h1 class="page-title">'+tr("dash_title")+'</h1><p class="page-sub">'+fmtDate(todayISO())+'</p></div>'+printButtonHTML()+'</div>' +
       '<div class="stat-grid">' +
         statCard(tr("statNightsOccupied"), s.nightsOccupied) +
         statCard(tr("statNightsAvailable"), s.daysInMonth) +
@@ -874,7 +875,7 @@
     }
 
     return '<div class="page-head"><div><h1 class="page-title">'+tr("cal_title")+'</h1><p class="page-sub">'+tr("cal_sub")+'</p></div>' +
-      '<button class="btn secondary small" data-action="cal-today">'+tr("today")+'</button></div>' +
+      '<div style="display:flex;gap:10px" class="no-print"><button class="btn secondary small" data-action="cal-today">'+tr("today")+'</button>'+printButtonHTML()+'</div></div>' +
       '<div class="panel">' +
         '<div class="cal-head"><button class="cal-icon-btn" data-action="cal-prev">'+ICONS.chevLeft+'</button>' +
         '<div class="cal-month-label">'+monthLabel+'</div>' +
@@ -898,7 +899,7 @@
     }).join("");
 
     return '<div class="page-head"><div><h1 class="page-title">'+tr("stays_title")+'</h1><p class="page-sub">'+tr("stays_sub")+'</p></div>' +
-      '<button class="btn" data-action="new-stay">'+ICONS.plus+' '+tr("addStay")+'</button></div>' +
+      '<div style="display:flex;gap:10px" class="no-print"><button class="btn" data-action="new-stay">'+ICONS.plus+' '+tr("addStay")+'</button>'+printButtonHTML()+'</div></div>' +
       '<div class="table-wrap"><table><thead><tr><th>'+tr("thGuest")+'</th><th>'+tr("thArrival")+'</th><th>'+tr("thDeparture")+'</th><th>'+tr("thNights")+'</th><th>'+tr("thGuests")+'</th><th>'+tr("thRooms")+'</th><th>'+tr("thSource")+'</th><th>'+tr("thStatus")+'</th><th></th></tr></thead><tbody>' +
       (rows || '<tr><td colspan="9" class="empty">'+tr("noStays")+'</td></tr>') + '</tbody></table></div>';
   }
@@ -922,8 +923,8 @@
     }).join("");
 
     return '<div class="page-head"><div><h1 class="page-title">'+tr("exp_title")+'</h1><p class="page-sub">'+tr("exp_sub")+'</p></div>' +
-      '<div style="display:flex;gap:10px;align-items:center"><input type="month" class="month-picker" id="expMonthInput" value="'+monthKey+'" />' +
-      '<button class="btn" data-action="new-expense">'+ICONS.plus+' '+tr("addExpense")+'</button></div></div>' +
+      '<div style="display:flex;gap:10px;align-items:center" class="no-print"><input type="month" class="month-picker" id="expMonthInput" value="'+monthKey+'" />' +
+      '<button class="btn" data-action="new-expense">'+ICONS.plus+' '+tr("addExpense")+'</button>'+printButtonHTML()+'</div></div>' +
       '<div class="two-col">' +
         '<div class="table-wrap"><table><thead><tr><th>'+tr("thDate")+'</th><th>'+tr("thDescription")+'</th><th>'+tr("thCategory")+'</th><th>'+tr("thSupplier")+'</th><th>'+tr("thAmount")+'</th><th></th></tr></thead><tbody>' +
         (rows || '<tr><td colspan="6" class="empty">'+tr("noExpensesMonth")+'</td></tr>') +
@@ -950,7 +951,7 @@
     }).join("");
 
     return '<div class="page-head"><div><h1 class="page-title">'+tr("maint_title")+'</h1><p class="page-sub">'+tr("maint_sub")+'</p></div>' +
-      '<button class="btn" data-action="new-maintenance">'+ICONS.plus+' '+tr("addMaintenance")+'</button></div>' +
+      '<div style="display:flex;gap:10px" class="no-print"><button class="btn" data-action="new-maintenance">'+ICONS.plus+' '+tr("addMaintenance")+'</button>'+printButtonHTML()+'</div></div>' +
       '<div class="table-wrap"><table><thead><tr><th>'+tr("thRoom")+'</th><th>'+tr("thDescription")+'</th><th>'+tr("thDateReported")+'</th><th>'+tr("thMaintStatus")+'</th><th>'+tr("thDateCompleted")+'</th><th></th></tr></thead><tbody>' +
       (rows || '<tr><td colspan="6" class="empty">'+tr("noMaintenance")+'</td></tr>') + '</tbody></table></div>';
   }
@@ -976,7 +977,7 @@
     }).join("");
 
     return '<div class="page-head"><div><h1 class="page-title">'+tr("stock_title")+'</h1><p class="page-sub">'+tr("stock_sub")+'</p></div>' +
-      '<button class="btn" data-action="new-stock">'+ICONS.plus+' '+tr("addStockItem")+'</button></div>' +
+      '<div style="display:flex;gap:10px" class="no-print"><button class="btn" data-action="new-stock">'+ICONS.plus+' '+tr("addStockItem")+'</button>'+printButtonHTML()+'</div></div>' +
       '<div class="table-wrap"><table><thead><tr><th>'+tr("thItem")+'</th><th>'+tr("thStockCategory")+'</th><th>'+tr("thQuantity")+'</th><th>'+tr("thUnit")+'</th><th>'+tr("thThreshold")+'</th><th>'+tr("thStockStatus")+'</th><th></th></tr></thead><tbody>' +
       (rows || '<tr><td colspan="7" class="empty">'+tr("noStock")+'</td></tr>') + '</tbody></table></div>';
   }
@@ -1105,7 +1106,7 @@
         '<p class="empty" style="margin-top:12px">'+tr("pwWarning")+'</p>' +
       '</div>';
     }
-    return '<div class="page-head"><div><h1 class="page-title">'+tr("set_title")+'</h1><p class="page-sub">'+tr("set_sub")+'</p></div></div>' +
+    return '<div class="page-head"><div><h1 class="page-title">'+tr("set_title")+'</h1><p class="page-sub">'+tr("set_sub")+'</p></div>'+printButtonHTML()+'</div>' +
       syncPanel + pwPanel +
       '<div class="settings-section panel"><div class="panel-title">'+tr("residence")+'</div>' +
         '<div class="form-grid">' +
@@ -1342,7 +1343,7 @@
       }) });
     }
     else if (action==="open-report"){ state.reportMonth = el.getAttribute("data-month"); state.tab="reports"; render(); }
-    else if (action==="print-report"){ window.print(); }
+    else if (action==="print-report" || action==="print-page"){ window.print(); }
     else if (action==="clear-demo"){
       update({ stays: d.stays.filter(function(s){ return !s.isDemo; }), expenses: d.expenses.filter(function(e){ return !e.isDemo; }), maintenanceItems: (d.maintenanceItems||[]).filter(function(m){ return !m.isDemo; }), stockItems: (d.stockItems||[]).filter(function(x){ return !x.isDemo; }) });
     }

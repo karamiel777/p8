@@ -38,6 +38,21 @@
   .lang-switch button { flex: 1; background: var(--card); border: none; padding: 7px 0; font-size: 11.5px; font-weight: 600; letter-spacing: 0.04em; color: var(--muted); cursor: pointer; font-family: inherit; }
   .lang-switch button.active { background: var(--ink); color: #fff; }
   .sidebar-foot { font-size: 10.5px; color: var(--muted); padding: 0 6px; letter-spacing: 0.02em; }
+  .save-btn { display: flex; align-items: center; justify-content: center; gap: 7px; background: var(--ink); color: #fff; border: none; padding: 9px 0; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; margin-bottom: 8px; width: 100%; }
+  .save-btn:hover { opacity: 0.9; }
+  .save-btn[disabled] { opacity: 0.5; cursor: default; }
+  .sync-status { display: flex; align-items: center; gap: 6px; font-size: 10.5px; padding: 0 6px; margin-bottom: 4px; }
+  .sync-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .sync-dot.ok { background: var(--sage); }
+  .sync-dot.warn { background: var(--brass); }
+  .sync-dot.err { background: var(--wine); }
+  .sync-dot.pending { background: var(--muted); }
+  .lock-screen { width: 100%; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .lock-box { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 36px 34px; width: 340px; max-width: 100%; text-align: center; }
+  .lock-box .mark { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 24px; font-weight: 600; }
+  .lock-box .sub { font-size: 10.5px; color: var(--muted); letter-spacing: 0.14em; margin-top: 3px; margin-bottom: 26px; }
+  .lock-box input { text-align: center; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .lock-error { color: var(--wine); font-size: 12px; margin-bottom: 10px; }
 
   .content { flex: 1; padding: 40px 48px; max-width: 1180px; }
   .page-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; gap: 16px; flex-wrap: wrap; }
@@ -158,6 +173,14 @@
 
   var STORAGE_KEY = "masoandro-p8-data-v1";
   var LANG_KEY = "masoandro-p8-lang";
+  var GH_TOKEN_KEY = "masoandro-p8-gh-token";
+  var GH_OWNER_KEY = "masoandro-p8-gh-owner";
+  var GH_REPO_KEY = "masoandro-p8-gh-repo";
+  var GH_OWNER_DEFAULT = "karamiel777";
+  var GH_REPO_DEFAULT = "p8";
+  var GH_PATH = "data.json";
+  var SAVE_DEBOUNCE_MS = 1800;
+  var UNLOCK_KEY = "masoandro-p8-unlocked-hash";
 
   var EXPENSE_CATEGORIES_DEFAULT = ["Electricity","Water","Internet","Gas","Cleaning","Laundry","Maintenance","Repairs","Security","Staff","Supplies","Transportation","Gardening","Pool / outdoor maintenance","Other"];
   var PAYMENT_METHODS = ["Cash","Bank transfer","Card","Mobile money","Other"];
@@ -202,6 +225,21 @@
       expenseCategories:"Expense categories", newCategoryName:"New category name", add:"Add",
       dataSection:"Data", dataDesc:"Export a backup of all stays, expenses and settings, or restore from a previous export.",
       exportData:"Export data (JSON)", importData:"Import data",
+      syncSection:"Sync across devices", syncDesc:"Connect this browser to your GitHub repository so every device sees the same data.",
+      syncConnected:"Connected", syncNotConnected:"Not connected — this device only sees data saved on it.",
+      syncOwner:"GitHub username", syncRepo:"Repository name", syncToken:"Personal access token", syncConnect:"Connect", syncDisconnect:"Disconnect",
+      syncReload:"Reload latest from GitHub", syncHowTitle:"How to get a token",
+      syncHowBody:"On GitHub: Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token. Give it access to this one repository only, with Repository permissions → Contents: Read and write. Copy the token and paste it below — it stays on this device only.",
+      sidebarSave:"Save now",
+      lastModified:"Last modified", statusSaved:"All changes saved", statusUnsaved:"Unsaved changes", statusSaving:"Saving…", statusError:"Sync failed — try again",
+      statusLocalOnly:"Saved on this device only", statusConflict:"Someone else saved changes — reload to see them",
+      never:"never",
+      lockTitle:"This site is protected", lockPlaceholder:"Password", lockButton:"Unlock", lockWrong:"Incorrect password.",
+      pwSection:"Password protection", pwEnabledDesc:"A password is currently required to view this site.",
+      pwDisabledDesc:"Anyone with the link can currently open this site. Set a password to require it before viewing.",
+      pwNew:"New password", pwConfirm:"Confirm password", pwSet:"Set password", pwChange:"Change password", pwRemove:"Remove password",
+      pwMismatch:"Passwords don't match.", pwTooShort:"Use at least 4 characters.",
+      pwWarning:"This is a simple visitor lock, not real security — this is a public code repository, so anyone determined could still read the password in the source. Don't use it to protect anything sensitive.",
       modalAddStay:"Add stay", modalEditStay:"Edit stay", guestName:"Guest name", arrivalDate:"Arrival date", departureDate:"Departure date",
       nights:function(n){ return n+" night"+(n!==1?"s":""); },
       numberOfGuests:"Number of guests", bookingSource:"Booking source", status:"Status", notes:"Notes",
@@ -255,6 +293,21 @@
       expenseCategories:"Catégories de dépenses", newCategoryName:"Nom de la nouvelle catégorie", add:"Ajouter",
       dataSection:"Données", dataDesc:"Exportez une sauvegarde de tous les séjours, dépenses et paramètres, ou restaurez une sauvegarde précédente.",
       exportData:"Exporter les données (JSON)", importData:"Importer des données",
+      syncSection:"Synchronisation entre appareils", syncDesc:"Connecte ce navigateur à ton dépôt GitHub pour que tous les appareils voient les mêmes données.",
+      syncConnected:"Connecté", syncNotConnected:"Non connecté — cet appareil ne voit que les données enregistrées dessus.",
+      syncOwner:"Nom d'utilisateur GitHub", syncRepo:"Nom du dépôt", syncToken:"Jeton d'accès personnel", syncConnect:"Connecter", syncDisconnect:"Déconnecter",
+      syncReload:"Recharger la dernière version depuis GitHub", syncHowTitle:"Comment obtenir un jeton",
+      syncHowBody:"Sur GitHub : Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token. Donne-lui accès uniquement à ce dépôt, avec la permission Repository → Contents : Read and write. Copie le jeton et colle-le ci-dessous — il reste uniquement sur cet appareil.",
+      sidebarSave:"Enregistrer maintenant",
+      lastModified:"Dernière modification", statusSaved:"Toutes les modifications sont enregistrées", statusUnsaved:"Modifications non enregistrées", statusSaving:"Enregistrement…", statusError:"Échec de synchronisation — réessayer",
+      statusLocalOnly:"Enregistré sur cet appareil uniquement", statusConflict:"Quelqu'un d'autre a enregistré des modifications — recharge pour les voir",
+      never:"jamais",
+      lockTitle:"Ce site est protégé", lockPlaceholder:"Mot de passe", lockButton:"Déverrouiller", lockWrong:"Mot de passe incorrect.",
+      pwSection:"Protection par mot de passe", pwEnabledDesc:"Un mot de passe est actuellement requis pour consulter ce site.",
+      pwDisabledDesc:"N'importe qui avec le lien peut actuellement ouvrir ce site. Définis un mot de passe pour l'exiger avant l'accès.",
+      pwNew:"Nouveau mot de passe", pwConfirm:"Confirmer le mot de passe", pwSet:"Définir le mot de passe", pwChange:"Changer le mot de passe", pwRemove:"Retirer le mot de passe",
+      pwMismatch:"Les mots de passe ne correspondent pas.", pwTooShort:"Utilise au moins 4 caractères.",
+      pwWarning:"C'est un simple verrou pour visiteurs, pas une vraie sécurité — ce dépôt de code est public, donc une personne déterminée pourrait quand même lire le mot de passe dans le code source. Ne t'en sers pas pour protéger quelque chose de sensible.",
       modalAddStay:"Ajouter un séjour", modalEditStay:"Modifier le séjour", guestName:"Nom du client", arrivalDate:"Date d'arrivée", departureDate:"Date de départ",
       nights:function(n){ return n+" nuit"+(n!==1?"s":""); },
       numberOfGuests:"Nombre de personnes", bookingSource:"Source de réservation", status:"Statut", notes:"Notes",
@@ -350,32 +403,204 @@
     reportMonth: todayISO().slice(0,7),
     expensesMonth: todayISO().slice(0,7),
     modal: null,
-    confirmAction: null
+    confirmAction: null,
+    ghToken: (function(){ try { return localStorage.getItem(GH_TOKEN_KEY) || ""; } catch(e){ return ""; } })(),
+    ghOwner: (function(){ try { return localStorage.getItem(GH_OWNER_KEY) || GH_OWNER_DEFAULT; } catch(e){ return GH_OWNER_DEFAULT; } })(),
+    ghRepo: (function(){ try { return localStorage.getItem(GH_REPO_KEY) || GH_REPO_DEFAULT; } catch(e){ return GH_REPO_DEFAULT; } })(),
+    remoteSha: null,
+    syncStatus: "idle", // idle | checking | saving | saved | error | conflict | localonly
+    dirty: false,
+    saveTimer: null,
+    locked: false,
+    lockError: false,
+    pwError: null
   };
 
-  function loadData(){
-    try {
-      var raw = localStorage.getItem(STORAGE_KEY);
-      state.data = raw ? JSON.parse(raw) : seedData();
-      if (!state.data.categories) state.data.categories = EXPENSE_CATEGORIES_DEFAULT.slice();
-      if (!state.data.monthlyNotes) state.data.monthlyNotes = {};
-    } catch(e){ state.data = seedData(); }
-    state.loading = false;
-    render();
+  function sha256Hex(str){
+    var enc = new TextEncoder().encode(str);
+    return crypto.subtle.digest("SHA-256", enc).then(function(buf){
+      return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,"0"); }).join("");
+    });
   }
-  function save(){
+
+  function computeLocked(){
+    var hash = state.data.accessPasswordHash;
+    if (!hash) return false;
+    var unlockedHash = null;
+    try { unlockedHash = localStorage.getItem(UNLOCK_KEY); } catch(e){}
+    return unlockedHash !== hash;
+  }
+
+  // ---------- base64 helpers (UTF-8 safe, for accented text) ----------
+  function b64Encode(str){
+    var bytes = new TextEncoder().encode(str);
+    var bin = "";
+    bytes.forEach(function(b){ bin += String.fromCharCode(b); });
+    return btoa(bin);
+  }
+  function b64Decode(b64){
+    var bin = atob(b64.replace(/\n/g,""));
+    var bytes = new Uint8Array(bin.length);
+    for (var i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+    return new TextDecoder().decode(bytes);
+  }
+
+  function ghHeaders(){
+    return { "Authorization": "token "+state.ghToken, "Accept": "application/vnd.github+json" };
+  }
+  function ghUrl(){
+    return "https://api.github.com/repos/"+state.ghOwner+"/"+state.ghRepo+"/contents/"+GH_PATH;
+  }
+
+  function fillDefaults(obj){
+    if (!obj.categories) obj.categories = EXPENSE_CATEGORIES_DEFAULT.slice();
+    if (!obj.monthlyNotes) obj.monthlyNotes = {};
+    if (!obj.lastModified) obj.lastModified = null;
+    return obj;
+  }
+
+  function loadData(){
+    var raw = null;
+    try { raw = localStorage.getItem(STORAGE_KEY); } catch(e){}
+    state.data = fillDefaults(raw ? JSON.parse(raw) : seedData());
+    state.locked = computeLocked();
+
+    if (!state.ghToken){
+      state.loading = false; render(); return;
+    }
+    state.syncStatus = "checking";
+    fetch(ghUrl(), { headers: ghHeaders() }).then(function(res){
+      if (res.status===404){ return null; } // no remote file yet
+      if (!res.ok) throw new Error("gh error "+res.status);
+      return res.json();
+    }).then(function(json){
+      if (json){
+        state.remoteSha = json.sha;
+        var remoteData = fillDefaults(JSON.parse(b64Decode(json.content)));
+        state.data = remoteData;
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data)); } catch(e){}
+        state.locked = computeLocked();
+      }
+      state.syncStatus = "saved";
+      state.loading = false; render();
+    }).catch(function(){
+      state.syncStatus = "error";
+      state.loading = false; render();
+    });
+  }
+
+  function saveLocalOnly(){
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data)); } catch(e){}
   }
   function saveLang(){
     try { localStorage.setItem(LANG_KEY, state.lang); } catch(e){}
   }
-  function update(patch){ state.data = Object.assign({}, state.data, patch); save(); render(); }
+
+  function update(patch){
+    state.data = Object.assign({}, state.data, patch);
+    state.data.lastModified = new Date().toISOString();
+    state.dirty = true;
+    saveLocalOnly();
+    render();
+    scheduleRemoteSave();
+  }
+
+  function scheduleRemoteSave(){
+    if (!state.ghToken) { state.syncStatus = "localonly"; return; }
+    if (state.saveTimer) clearTimeout(state.saveTimer);
+    state.saveTimer = setTimeout(function(){ doRemoteSave(); }, SAVE_DEBOUNCE_MS);
+  }
+
+  function doRemoteSave(retry){
+    if (state.saveTimer) { clearTimeout(state.saveTimer); state.saveTimer = null; }
+    if (!state.ghToken){ state.syncStatus = "localonly"; render(); return; }
+    state.syncStatus = "saving"; render();
+    var body = { message: "Update data via app", content: b64Encode(JSON.stringify(state.data)), branch: "main" };
+    if (state.remoteSha) body.sha = state.remoteSha;
+    fetch(ghUrl(), { method:"PUT", headers: Object.assign({"Content-Type":"application/json"}, ghHeaders()), body: JSON.stringify(body) })
+      .then(function(res){
+        if (res.status===409 && !retry){
+          // conflict: refetch sha once and retry
+          return fetch(ghUrl(), { headers: ghHeaders() }).then(function(r2){ return r2.json(); }).then(function(j2){
+            state.remoteSha = j2.sha; return doRemoteSave(true);
+          });
+        }
+        if (!res.ok) throw new Error("gh save error "+res.status);
+        return res.json();
+      }).then(function(json){
+        if (json && json.content){
+          state.remoteSha = json.content.sha;
+          state.dirty = false;
+          state.syncStatus = "saved";
+          render();
+        }
+      }).catch(function(){ state.syncStatus = "error"; render(); });
+  }
+
+  function ghReloadLatest(){
+    if (!state.ghToken) return;
+    state.syncStatus = "checking"; render();
+    fetch(ghUrl(), { headers: ghHeaders() }).then(function(res){
+      if (!res.ok) throw new Error("reload failed");
+      return res.json();
+    }).then(function(json){
+      state.remoteSha = json.sha;
+      state.data = fillDefaults(JSON.parse(b64Decode(json.content)));
+      saveLocalOnly();
+      state.dirty = false; state.syncStatus = "saved"; render();
+    }).catch(function(){ state.syncStatus = "error"; render(); });
+  }
+
+  function ghConnect(owner, repo, token){
+    state.ghOwner = owner || GH_OWNER_DEFAULT;
+    state.ghRepo = repo || GH_REPO_DEFAULT;
+    state.ghToken = token;
+    try {
+      localStorage.setItem(GH_OWNER_KEY, state.ghOwner);
+      localStorage.setItem(GH_REPO_KEY, state.ghRepo);
+      localStorage.setItem(GH_TOKEN_KEY, state.ghToken);
+    } catch(e){}
+    state.loading = true; render();
+    loadData();
+  }
+  function ghDisconnect(){
+    state.ghToken = ""; state.remoteSha = null; state.syncStatus = "idle";
+    try { localStorage.removeItem(GH_TOKEN_KEY); } catch(e){}
+    render();
+  }
+
+  function fmtDateTime(iso){
+    if (!iso) return tr("never");
+    var dt = new Date(iso);
+    return dt.toLocaleDateString(tr("dateLocale"),{day:"2-digit",month:"short"}) + " " + dt.toLocaleTimeString(tr("dateLocale"),{hour:"2-digit",minute:"2-digit"});
+  }
+  function syncDotClass(){
+    if (!state.ghToken) return "pending";
+    if (state.syncStatus==="saved") return "ok";
+    if (state.syncStatus==="saving" || state.syncStatus==="checking") return "pending";
+    if (state.syncStatus==="error" || state.syncStatus==="conflict") return "err";
+    return "warn";
+  }
+  function syncStatusText(){
+    if (!state.ghToken) return tr("statusLocalOnly");
+    if (state.syncStatus==="saving") return tr("statusSaving");
+    if (state.syncStatus==="checking") return tr("statusSaving");
+    if (state.syncStatus==="error") return tr("statusError");
+    if (state.syncStatus==="conflict") return tr("statusConflict");
+    if (state.dirty) return tr("statusUnsaved");
+    return tr("statusSaved");
+  }
 
   var root = document.getElementById("root");
+
 
   function render(){
     if (state.loading || !state.data){
       root.innerHTML = '<div class="loading">…</div>';
+      return;
+    }
+    if (state.locked){
+      renderLockScreen();
       return;
     }
     var d = state.data;
@@ -408,6 +633,9 @@
           '<div class="brand"><div class="mark">'+esc(d.residence.name)+'</div><div class="sub">'+esc((d.residence.subtitle||"").toUpperCase())+'</div></div>' +
           '<nav class="nav">' + navHTML + '</nav>' +
           '<div class="lang-switch"><button class="'+(state.lang==="fr"?"active":"")+'" data-action="lang" data-lang="fr">FR</button><button class="'+(state.lang==="en"?"active":"")+'" data-action="lang" data-lang="en">EN</button></div>' +
+          '<button class="save-btn" data-action="save-now"'+(state.dirty||state.syncStatus==="error"?"":" disabled")+'>'+tr("sidebarSave")+'</button>' +
+          '<div class="sync-status"><span class="sync-dot '+syncDotClass()+'"></span><span>'+syncStatusText()+'</span></div>' +
+          '<div class="sync-status" style="margin-bottom:10px"><span>'+tr("lastModified")+' : '+fmtDateTime(d.lastModified)+'</span></div>' +
           '<div class="sidebar-foot">'+tr("sidebarFoot")+'</div>' +
         '</aside>' +
         '<main class="content">' + banner + content + '</main>' +
@@ -638,7 +866,58 @@
 
   function settingsHTML(d){
     var catChips = d.categories.map(function(c){ return '<span class="chip">'+trCategory(c)+'<button data-action="remove-category" data-cat="'+esc(c)+'">'+ICONS.x+'</button></span>'; }).join("");
+    var syncPanel;
+    if (state.ghToken){
+      syncPanel = '<div class="settings-section panel"><div class="panel-title">'+tr("syncSection")+'</div>' +
+        '<div class="row"><span><span class="sync-dot '+syncDotClass()+'" style="display:inline-block;margin-right:8px"></span>'+tr("syncConnected")+' — '+esc(state.ghOwner)+'/'+esc(state.ghRepo)+'</span></div>' +
+        '<div class="row"><span>'+tr("lastModified")+'</span><span>'+fmtDateTime(d.lastModified)+'</span></div>' +
+        '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">' +
+          '<button class="btn secondary small" data-action="gh-reload">'+tr("syncReload")+'</button>' +
+          '<button class="btn subtle small" data-action="gh-disconnect">'+tr("syncDisconnect")+'</button>' +
+        '</div>' +
+      '</div>';
+    } else {
+      syncPanel = '<div class="settings-section panel"><div class="panel-title">'+tr("syncSection")+'</div>' +
+        '<p class="empty" style="margin-bottom:12px">'+tr("syncDesc")+' '+tr("syncNotConnected")+'</p>' +
+        '<div class="form-grid">' +
+          '<label class="field">'+tr("syncOwner")+'<input type="text" id="syncOwnerInput" value="'+esc(state.ghOwner)+'" /></label>' +
+          '<label class="field">'+tr("syncRepo")+'<input type="text" id="syncRepoInput" value="'+esc(state.ghRepo)+'" /></label>' +
+        '</div>' +
+        '<div class="form-grid single"><label class="field">'+tr("syncToken")+'<input type="password" id="syncTokenInput" placeholder="github_pat_…" /></label></div>' +
+        '<button class="btn small" data-action="gh-connect">'+tr("syncConnect")+'</button>' +
+        '<p class="empty" style="margin-top:14px"><strong>'+tr("syncHowTitle")+'</strong><br/>'+tr("syncHowBody")+'</p>' +
+      '</div>';
+    }
+
+    var pwPanel;
+    if (d.accessPasswordHash){
+      pwPanel = '<div class="settings-section panel"><div class="panel-title">'+tr("pwSection")+'</div>' +
+        '<p class="empty" style="margin-bottom:12px">'+tr("pwEnabledDesc")+'</p>' +
+        '<div class="form-grid">' +
+          '<label class="field">'+tr("pwNew")+'<input type="password" id="pwNewInput" /></label>' +
+          '<label class="field">'+tr("pwConfirm")+'<input type="password" id="pwConfirmInput" /></label>' +
+        '</div>' +
+        (state.pwError ? '<p class="lock-error">'+esc(state.pwError)+'</p>' : '') +
+        '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
+          '<button class="btn secondary small" data-action="pw-set">'+tr("pwChange")+'</button>' +
+          '<button class="btn danger small" data-action="pw-remove">'+tr("pwRemove")+'</button>' +
+        '</div>' +
+        '<p class="empty" style="margin-top:12px">'+tr("pwWarning")+'</p>' +
+      '</div>';
+    } else {
+      pwPanel = '<div class="settings-section panel"><div class="panel-title">'+tr("pwSection")+'</div>' +
+        '<p class="empty" style="margin-bottom:12px">'+tr("pwDisabledDesc")+'</p>' +
+        '<div class="form-grid">' +
+          '<label class="field">'+tr("pwNew")+'<input type="password" id="pwNewInput" /></label>' +
+          '<label class="field">'+tr("pwConfirm")+'<input type="password" id="pwConfirmInput" /></label>' +
+        '</div>' +
+        (state.pwError ? '<p class="lock-error">'+esc(state.pwError)+'</p>' : '') +
+        '<button class="btn small" data-action="pw-set">'+tr("pwSet")+'</button>' +
+        '<p class="empty" style="margin-top:12px">'+tr("pwWarning")+'</p>' +
+      '</div>';
+    }
     return '<div class="page-head"><div><h1 class="page-title">'+tr("set_title")+'</h1><p class="page-sub">'+tr("set_sub")+'</p></div></div>' +
+      syncPanel + pwPanel +
       '<div class="settings-section panel"><div class="panel-title">'+tr("residence")+'</div>' +
         '<div class="form-grid">' +
           '<label class="field">'+tr("name")+'<input type="text" id="settName" value="'+esc(d.residence.name)+'" /></label>' +
@@ -729,6 +1008,30 @@
   }
   function closeModal(){ state.modal = null; render(); }
 
+  function renderLockScreen(){
+    var d = state.data;
+    root.innerHTML = '<div class="lock-screen"><div class="lock-box">' +
+      '<div class="mark">'+esc(d.residence.name)+'</div><div class="sub">'+esc((d.residence.subtitle||"").toUpperCase())+'</div>' +
+      '<form id="lockForm">' +
+        '<input type="password" id="lockInput" placeholder="'+tr("lockPlaceholder")+'" autofocus />' +
+        (state.lockError ? '<div class="lock-error">'+tr("lockWrong")+'</div>' : '') +
+        '<button class="btn" type="submit" style="width:100%;justify-content:center">'+tr("lockButton")+'</button>' +
+      '</form>' +
+    '</div></div>';
+    document.getElementById("lockForm").addEventListener("submit", function(e){
+      e.preventDefault();
+      var val = document.getElementById("lockInput").value;
+      sha256Hex(val).then(function(hash){
+        if (hash === state.data.accessPasswordHash){
+          try { localStorage.setItem(UNLOCK_KEY, hash); } catch(err){}
+          state.locked = false; state.lockError = false; render();
+        } else {
+          state.lockError = true; render();
+        }
+      });
+    });
+  }
+
   function confirmHTML(){
     return '<div class="modal-overlay" id="confirmOverlay"><div class="modal-box" style="width:340px">' +
       '<div class="modal-head"><h3>'+tr("confirmDeleteTitle")+'</h3></div>' +
@@ -756,6 +1059,32 @@
 
     if (action==="tab"){ state.tab = el.getAttribute("data-tab"); state.selectedDay=null; render(); }
     else if (action==="lang"){ state.lang = el.getAttribute("data-lang"); saveLang(); render(); }
+    else if (action==="save-now"){ doRemoteSave(); }
+    else if (action==="gh-connect"){
+      var owner = document.getElementById("syncOwnerInput").value.trim();
+      var repo = document.getElementById("syncRepoInput").value.trim();
+      var token = document.getElementById("syncTokenInput").value.trim();
+      if (!token) return;
+      ghConnect(owner, repo, token);
+    }
+    else if (action==="gh-disconnect"){ ghDisconnect(); }
+    else if (action==="gh-reload"){ ghReloadLatest(); }
+    else if (action==="pw-set"){
+      var pw1 = document.getElementById("pwNewInput").value;
+      var pw2 = document.getElementById("pwConfirmInput").value;
+      if (pw1.length < 4){ state.pwError = tr("pwTooShort"); render(); return; }
+      if (pw1 !== pw2){ state.pwError = tr("pwMismatch"); render(); return; }
+      sha256Hex(pw1).then(function(hash){
+        state.pwError = null;
+        try { localStorage.setItem(UNLOCK_KEY, hash); } catch(err){}
+        update({ accessPasswordHash: hash });
+      });
+    }
+    else if (action==="pw-remove"){
+      state.pwError = null;
+      try { localStorage.removeItem(UNLOCK_KEY); } catch(err){}
+      update({ accessPasswordHash: null });
+    }
     else if (action==="cal-prev"){ var p=state.calendarMonth.split("-"); var dt=new Date(Number(p[0]),Number(p[1])-2,1); state.calendarMonth=dt.getFullYear()+"-"+pad2(dt.getMonth()+1); render(); }
     else if (action==="cal-next"){ var p2=state.calendarMonth.split("-"); var dt2=new Date(Number(p2[0]),Number(p2[1]),1); state.calendarMonth=dt2.getFullYear()+"-"+pad2(dt2.getMonth()+1); render(); }
     else if (action==="cal-today"){ state.calendarMonth = todayISO().slice(0,7); state.selectedDay = todayISO(); render(); }
@@ -802,10 +1131,11 @@
         try {
           var parsed = JSON.parse(reader.result);
           if (!parsed.stays || !parsed.expenses) throw new Error("invalid");
-          state.data = parsed;
-          if (!state.data.categories) state.data.categories = EXPENSE_CATEGORIES_DEFAULT.slice();
-          if (!state.data.monthlyNotes) state.data.monthlyNotes = {};
-          save(); render();
+          state.data = fillDefaults(parsed);
+          state.data.lastModified = new Date().toISOString();
+          state.dirty = true;
+          saveLocalOnly(); render();
+          scheduleRemoteSave();
         } catch(err){ alert(tr("importInvalid")); }
       };
       reader.readAsText(file);

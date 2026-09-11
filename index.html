@@ -216,7 +216,7 @@
       legendOccupied:"Occupied", legendFlag:"Arrival / Departure flag", legendToday:"Today",
       flagArrival:"Arrival", flagDeparture:"Departure", noStayThisDay:"No stay on this day.",
       stays_title:"Stays", stays_sub:"Reservations and guest check-ins", addStay:"Add stay",
-      thGuest:"Guest", thArrival:"Arrival", thDeparture:"Departure", thNights:"Nights", thGuests:"Guests", thSource:"Source", thStatus:"Status",
+      thGuest:"Guest", thArrival:"Arrival", thDeparture:"Departure", thNights:"Nights", thGuests:"Guests", thRooms:"Rooms", thSource:"Source", thStatus:"Status",
       noStays:"No stays recorded yet.",
       exp_title:"Expenses", exp_sub:"Operating costs by month", addExpense:"Add expense",
       thDate:"Date", thDescription:"Description", thCategory:"Category", thSupplier:"Supplier", thAmount:"Amount",
@@ -253,7 +253,7 @@
       pwWarning:"This is a simple visitor lock, not real security — this is a public code repository, so anyone determined could still read the password in the source. Don't use it to protect anything sensitive.",
       modalAddStay:"Add stay", modalEditStay:"Edit stay", guestName:"Guest name", arrivalDate:"Arrival date", departureDate:"Departure date",
       nights:function(n){ return n+" night"+(n!==1?"s":""); },
-      numberOfGuests:"Number of guests", bookingSource:"Booking source", status:"Status", notes:"Notes",
+      numberOfGuests:"Number of guests", roomsRented:"Rooms rented (out of 4)", bookingSource:"Booking source", status:"Status", notes:"Notes",
       cancel:"Cancel", saveChanges:"Save changes",
       modalAddExpense:"Add expense", modalEditExpense:"Edit expense", amountAr:"Amount (Ar)", description:"Description", category:"Category", paymentMethod:"Payment method", supplier:"Supplier",
       confirmDeleteTitle:"Delete this entry?", confirmDeleteBody:"This action cannot be undone.", delete:"Delete",
@@ -284,7 +284,7 @@
       legendOccupied:"Occupé", legendFlag:"Repère arrivée / départ", legendToday:"Aujourd'hui",
       flagArrival:"Arrivée", flagDeparture:"Départ", noStayThisDay:"Aucun séjour ce jour-là.",
       stays_title:"Séjours", stays_sub:"Réservations et arrivées des clients", addStay:"Ajouter un séjour",
-      thGuest:"Client", thArrival:"Arrivée", thDeparture:"Départ", thNights:"Nuits", thGuests:"Personnes", thSource:"Source", thStatus:"Statut",
+      thGuest:"Client", thArrival:"Arrivée", thDeparture:"Départ", thNights:"Nuits", thGuests:"Personnes", thRooms:"Chambres", thSource:"Source", thStatus:"Statut",
       noStays:"Aucun séjour enregistré pour l'instant.",
       exp_title:"Dépenses", exp_sub:"Coûts d'exploitation par mois", addExpense:"Ajouter une dépense",
       thDate:"Date", thDescription:"Description", thCategory:"Catégorie", thSupplier:"Fournisseur", thAmount:"Montant",
@@ -321,7 +321,7 @@
       pwWarning:"C'est un simple verrou pour visiteurs, pas une vraie sécurité — ce dépôt de code est public, donc une personne déterminée pourrait quand même lire le mot de passe dans le code source. Ne t'en sers pas pour protéger quelque chose de sensible.",
       modalAddStay:"Ajouter un séjour", modalEditStay:"Modifier le séjour", guestName:"Nom du client", arrivalDate:"Date d'arrivée", departureDate:"Date de départ",
       nights:function(n){ return n+" nuit"+(n!==1?"s":""); },
-      numberOfGuests:"Nombre de personnes", bookingSource:"Source de réservation", status:"Statut", notes:"Notes",
+      numberOfGuests:"Nombre de personnes", roomsRented:"Chambres louées (sur 4)", bookingSource:"Source de réservation", status:"Statut", notes:"Notes",
       cancel:"Annuler", saveChanges:"Enregistrer",
       modalAddExpense:"Ajouter une dépense", modalEditExpense:"Modifier la dépense", amountAr:"Montant (Ar)", description:"Description", category:"Catégorie", paymentMethod:"Mode de paiement", supplier:"Fournisseur",
       confirmDeleteTitle:"Supprimer cet élément ?", confirmDeleteBody:"Cette action est irréversible.", delete:"Supprimer",
@@ -390,10 +390,10 @@
       residence: { name: "Masoandro P8 Home", subtitle: "The Residence" },
       categories: EXPENSE_CATEGORIES_DEFAULT.slice(),
       stays: [
-        { id: uid(), guestName: "L. Andrianasolo", arrival: iso(3), departure: iso(7), guests: 2, source: "Airbnb", status: "Checked-out", notes: "", isDemo: true },
-        { id: uid(), guestName: "R. Rakoto", arrival: iso(9), departure: iso(12), guests: 3, source: "Direct", status: "Checked-out", notes: "", isDemo: true },
-        { id: uid(), guestName: "M. Dubois", arrival: iso(15), departure: iso(20), guests: 2, source: "Booking.com", status: "Checked-in", notes: "Late check-in requested", isDemo: true },
-        { id: uid(), guestName: "T. Randria", arrival: iso(24), departure: iso(28), guests: 4, source: "Airbnb", status: "Confirmed", notes: "", isDemo: true }
+        { id: uid(), guestName: "L. Andrianasolo", arrival: iso(3), departure: iso(7), guests: 2, roomsRented: 1, source: "Airbnb", status: "Checked-out", notes: "", isDemo: true },
+        { id: uid(), guestName: "R. Rakoto", arrival: iso(9), departure: iso(12), guests: 3, roomsRented: 2, source: "Direct", status: "Checked-out", notes: "", isDemo: true },
+        { id: uid(), guestName: "M. Dubois", arrival: iso(15), departure: iso(20), guests: 2, roomsRented: 1, source: "Booking.com", status: "Checked-in", notes: "Late check-in requested", isDemo: true },
+        { id: uid(), guestName: "T. Randria", arrival: iso(24), departure: iso(28), guests: 4, roomsRented: 4, source: "Airbnb", status: "Confirmed", notes: "", isDemo: true }
       ],
       expenses: [
         { id: uid(), date: iso(2), description: "Monthly electricity bill", category: "Electricity", amount: 180000, paymentMethod: "Bank transfer", supplier: "JIRAMA", notes: "", isDemo: true },
@@ -818,7 +818,7 @@
     var sorted = d.stays.slice().sort(function(a,b){ return a.arrival<b.arrival?1:-1; });
     var rows = sorted.map(function(s){
       var nights = nightsBetween(s.arrival, s.departure);
-      return '<tr><td>'+esc(s.guestName)+'</td><td>'+fmtDate(s.arrival)+'</td><td>'+fmtDate(s.departure)+'</td><td>'+nights+'</td><td>'+s.guests+'</td>' +
+      return '<tr><td>'+esc(s.guestName)+'</td><td>'+fmtDate(s.arrival)+'</td><td>'+fmtDate(s.departure)+'</td><td>'+nights+'</td><td>'+s.guests+'</td><td>'+(s.roomsRented||1)+'</td>' +
         '<td>'+trSource(s.source)+'</td><td><span class="status-pill status-'+s.status+'">'+trStatus(s.status)+'</span></td>' +
         '<td class="row-actions"><button class="icon-btn" data-action="edit-stay" data-id="'+s.id+'">'+ICONS.edit+'</button>' +
         '<button class="icon-btn" data-action="ask-delete-stay" data-id="'+s.id+'">'+ICONS.trash+'</button></td></tr>';
@@ -826,8 +826,8 @@
 
     return '<div class="page-head"><div><h1 class="page-title">'+tr("stays_title")+'</h1><p class="page-sub">'+tr("stays_sub")+'</p></div>' +
       '<button class="btn" data-action="new-stay">'+ICONS.plus+' '+tr("addStay")+'</button></div>' +
-      '<div class="table-wrap"><table><thead><tr><th>'+tr("thGuest")+'</th><th>'+tr("thArrival")+'</th><th>'+tr("thDeparture")+'</th><th>'+tr("thNights")+'</th><th>'+tr("thGuests")+'</th><th>'+tr("thSource")+'</th><th>'+tr("thStatus")+'</th><th></th></tr></thead><tbody>' +
-      (rows || '<tr><td colspan="8" class="empty">'+tr("noStays")+'</td></tr>') + '</tbody></table></div>';
+      '<div class="table-wrap"><table><thead><tr><th>'+tr("thGuest")+'</th><th>'+tr("thArrival")+'</th><th>'+tr("thDeparture")+'</th><th>'+tr("thNights")+'</th><th>'+tr("thGuests")+'</th><th>'+tr("thRooms")+'</th><th>'+tr("thSource")+'</th><th>'+tr("thStatus")+'</th><th></th></tr></thead><tbody>' +
+      (rows || '<tr><td colspan="9" class="empty">'+tr("noStays")+'</td></tr>') + '</tbody></table></div>';
   }
 
   function expensesHTML(d){
@@ -872,11 +872,11 @@
     var sortedStays = s.overlappingStays.slice().sort(function(a,b){ return a.arrival<b.arrival?-1:1; });
     var staysRows = sortedStays.map(function(st){
       var nightsInThisMonth = nightsInMonth(st, s.y, s.m-1);
-      return '<tr><td>'+esc(st.guestName)+'</td><td>'+fmtDate(st.arrival)+'</td><td>'+fmtDate(st.departure)+'</td><td style="text-align:right">'+nightsInThisMonth+'</td></tr>';
+      return '<tr><td>'+esc(st.guestName)+'</td><td>'+fmtDate(st.arrival)+'</td><td>'+fmtDate(st.departure)+'</td><td style="text-align:center">'+(st.roomsRented||1)+'</td><td style="text-align:right">'+nightsInThisMonth+'</td></tr>';
     }).join("");
-    var staysTable = '<div class="table-wrap" style="margin-top:10px"><table><thead><tr><th>'+tr("thGuest")+'</th><th>'+tr("thArrival")+'</th><th>'+tr("thDeparture")+'</th><th style="text-align:right">'+tr("thNights")+'</th></tr></thead><tbody>' +
-      (staysRows || '<tr><td colspan="4" class="empty">'+tr("noStays")+'</td></tr>') +
-      '</tbody><tfoot><tr><td colspan="3" style="text-align:right;font-weight:700">'+tr("totalNights")+'</td><td style="text-align:right;font-weight:700">'+s.nightsOccupied+'</td></tr></tfoot></table></div>';
+    var staysTable = '<div class="table-wrap" style="margin-top:10px"><table><thead><tr><th>'+tr("thGuest")+'</th><th>'+tr("thArrival")+'</th><th>'+tr("thDeparture")+'</th><th style="text-align:center">'+tr("thRooms")+'</th><th style="text-align:right">'+tr("thNights")+'</th></tr></thead><tbody>' +
+      (staysRows || '<tr><td colspan="5" class="empty">'+tr("noStays")+'</td></tr>') +
+      '</tbody><tfoot><tr><td colspan="4" style="text-align:right;font-weight:700">'+tr("totalNights")+'</td><td style="text-align:right;font-weight:700">'+s.nightsOccupied+'</td></tr></tfoot></table></div>';
 
     var sortedExpenses = s.monthExpenses.slice().sort(function(a,b){ return a.date<b.date?-1:1; });
     var expenseRows = sortedExpenses.map(function(e){
@@ -1029,6 +1029,9 @@
           '<div id="nightsPreview" class="nights-preview">'+tr("nights")(nightsBetween(arr,dep))+'</div>' +
           '<div class="form-grid">' +
             '<label class="field">'+tr("numberOfGuests")+'<input type="number" name="guests" min="1" value="'+(editing?editing.guests:1)+'" required /></label>' +
+            '<label class="field">'+tr("roomsRented")+'<select name="roomsRented">'+[1,2,3,4].map(function(n){ return '<option value="'+n+'"'+(editing&&editing.roomsRented===n?' selected':(!editing&&n===1?' selected':''))+'>'+n+'</option>'; }).join("")+'</select></label>' +
+          '</div>' +
+          '<div class="form-grid">' +
             '<label class="field">'+tr("bookingSource")+'<select name="source">'+srcOpts+'</select></label>' +
           '</div>' +
           '<div class="form-grid"><label class="field">'+tr("status")+'<select name="status">'+statOpts+'</select></label></div>' +
@@ -1230,7 +1233,7 @@
       var id = fd.get("id");
       var payload = {
         guestName: fd.get("guestName"), arrival: fd.get("arrival"), departure: fd.get("departure"),
-        guests: Number(fd.get("guests"))||1, source: fd.get("source"), status: fd.get("status"), notes: fd.get("notes")
+        guests: Number(fd.get("guests"))||1, roomsRented: Number(fd.get("roomsRented"))||1, source: fd.get("source"), status: fd.get("status"), notes: fd.get("notes")
       };
       if (id){
         update({ stays: d.stays.map(function(s){ return s.id===id ? Object.assign({},s,payload) : s; }) });

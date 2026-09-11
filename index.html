@@ -109,6 +109,9 @@
   .status-Checked-in { background: var(--sage-soft); color: var(--sage); }
   .status-Checked-out { background: var(--line); color: var(--muted); }
   .status-Cancelled { background: var(--wine-soft); color: var(--wine); }
+  .status-Todo { background: var(--wine-soft); color: var(--wine); }
+  .status-InProgress { background: var(--brass-soft); color: var(--brass); }
+  .status-Done { background: var(--sage-soft); color: var(--sage); }
   .icon-btn { background: none; border: none; color: var(--muted); cursor: pointer; padding: 5px; border-radius: 4px; display: inline-flex; }
   .icon-btn:hover { color: var(--wine); background: var(--wine-soft); }
   .row-actions { display: flex; gap: 4px; }
@@ -197,6 +200,9 @@
   var PAYMENT_METHODS = ["Cash","Bank transfer","Card","Mobile money","Other"];
   var BOOKING_SOURCES = ["Airbnb","Booking.com","Direct","Other"];
   var STAY_STATUSES = ["Confirmed","Checked-in","Checked-out","Cancelled"];
+  var MAINT_ROOMS = ["villa1","villa2","bungalow1","bungalow2","common"];
+  var MAINT_STATUSES = ["Todo","InProgress","Done"];
+  var STOCK_CATEGORIES = ["Linens","Cleaning","Kitchen","Toiletries","Maintenance","Other"];
 
   // ---------- i18n ----------
   var T = {
@@ -245,6 +251,23 @@
       lastModified:"Last modified", statusSaved:"All changes saved", statusUnsaved:"Unsaved changes", statusSaving:"Saving…", statusError:"Sync failed — try again",
       statusLocalOnly:"Saved on this device only", statusConflict:"Someone else saved changes — reload to see them",
       never:"never",
+      nav_maintenance:"Maintenance",
+      maint_title:"Maintenance", maint_sub:"What's been fixed, and what's still pending", addMaintenance:"Add maintenance item",
+      thRoom:"Room / area", thDateReported:"Reported", thDateCompleted:"Completed", thMaintStatus:"Status",
+      modalAddMaintenance:"Add maintenance item", modalEditMaintenance:"Edit maintenance item",
+      dateReported:"Date reported", dateCompleted:"Date completed (optional)",
+      noMaintenance:"No maintenance items yet.",
+      maintStatus_Todo:"To do", maintStatus_InProgress:"In progress", maintStatus_Done:"Done",
+      room_villa1:"Villa — Room 1", room_villa2:"Villa — Room 2", room_bungalow1:"Bungalow 1", room_bungalow2:"Bungalow 2", room_common:"Common area",
+      panelMaintenance:"Maintenance pending", noMaintenancePending:"Nothing pending — all caught up.",
+      nav_stock:"Stock",
+      stock_title:"Stock", stock_sub:"Supplies on hand, and what needs restocking", addStockItem:"Add item",
+      thItem:"Item", thStockCategory:"Category", thQuantity:"Quantity", thUnit:"Unit", thThreshold:"Alert below", thStockStatus:"Status",
+      modalAddStock:"Add stock item", modalEditStock:"Edit stock item",
+      itemName:"Item name", quantity:"Quantity", unit:"Unit (optional)", threshold:"Alert threshold",
+      noStock:"No stock items yet.", stockOk:"OK", stockToBuy:"To buy",
+      stockCat_Linens:"Linens", stockCat_Cleaning:"Cleaning", stockCat_Kitchen:"Kitchen", stockCat_Toiletries:"Toiletries", stockCat_Maintenance:"Maintenance", stockCat_Other:"Other",
+      panelToBuy:"To buy", noToBuy:"Nothing to buy — stock levels are fine.",
       lockTitle:"This site is protected", lockPlaceholder:"Password", lockButton:"Unlock", lockWrong:"Incorrect password.",
       pwSection:"Password protection", pwEnabledDesc:"A password is currently required to view this site.",
       pwDisabledDesc:"Anyone with the link can currently open this site. Set a password to require it before viewing.",
@@ -313,6 +336,23 @@
       lastModified:"Dernière modification", statusSaved:"Toutes les modifications sont enregistrées", statusUnsaved:"Modifications non enregistrées", statusSaving:"Enregistrement…", statusError:"Échec de synchronisation — réessayer",
       statusLocalOnly:"Enregistré sur cet appareil uniquement", statusConflict:"Quelqu'un d'autre a enregistré des modifications — recharge pour les voir",
       never:"jamais",
+      nav_maintenance:"Maintenance",
+      maint_title:"Maintenance", maint_sub:"Ce qui a été réparé, et ce qui reste à faire", addMaintenance:"Ajouter une intervention",
+      thRoom:"Chambre / zone", thDateReported:"Signalé le", thDateCompleted:"Terminé le", thMaintStatus:"Statut",
+      modalAddMaintenance:"Ajouter une intervention", modalEditMaintenance:"Modifier l'intervention",
+      dateReported:"Date de signalement", dateCompleted:"Date de fin (optionnel)",
+      noMaintenance:"Aucune intervention enregistrée pour l'instant.",
+      maintStatus_Todo:"À faire", maintStatus_InProgress:"En cours", maintStatus_Done:"Terminé",
+      room_villa1:"Villa — Chambre 1", room_villa2:"Villa — Chambre 2", room_bungalow1:"Bungalow 1", room_bungalow2:"Bungalow 2", room_common:"Zone commune",
+      panelMaintenance:"Maintenance en attente", noMaintenancePending:"Rien en attente — tout est à jour.",
+      nav_stock:"Stock",
+      stock_title:"Stock", stock_sub:"Ce qu'il reste, et ce qu'il faut racheter", addStockItem:"Ajouter un article",
+      thItem:"Article", thStockCategory:"Catégorie", thQuantity:"Quantité", thUnit:"Unité", thThreshold:"Seuil d'alerte", thStockStatus:"Statut",
+      modalAddStock:"Ajouter un article", modalEditStock:"Modifier l'article",
+      itemName:"Nom de l'article", quantity:"Quantité", unit:"Unité (optionnel)", threshold:"Seuil d'alerte",
+      noStock:"Aucun article enregistré pour l'instant.", stockOk:"OK", stockToBuy:"À acheter",
+      stockCat_Linens:"Linge", stockCat_Cleaning:"Ménage", stockCat_Kitchen:"Cuisine", stockCat_Toiletries:"Accueil / toilette", stockCat_Maintenance:"Entretien", stockCat_Other:"Autre",
+      panelToBuy:"À acheter", noToBuy:"Rien à acheter — les stocks sont bons.",
       lockTitle:"Ce site est protégé", lockPlaceholder:"Mot de passe", lockButton:"Déverrouiller", lockWrong:"Mot de passe incorrect.",
       pwSection:"Protection par mot de passe", pwEnabledDesc:"Un mot de passe est actuellement requis pour consulter ce site.",
       pwDisabledDesc:"N'importe qui avec le lien peut actuellement ouvrir ce site. Définis un mot de passe pour l'exiger avant l'accès.",
@@ -343,8 +383,13 @@
   function trSource(s){ if (s==="Direct") return tr("src_Direct"); if (s==="Other") return tr("src_Other"); return s; }
   function trPayment(p){ return tr("pay_"+p.replace(/[^A-Za-z]/g,"")); }
   function trCategory(c){ var key = "cat_"+c.replace(/[^A-Za-z]/g,""); var d = T[state.lang]||T.fr; return d[key]!==undefined ? d[key] : c; }
+  function trRoom(r){ return tr("room_"+r); }
+  function trMaintStatus(s){ return tr("maintStatus_"+s); }
+  function trStockCategory(c){ return tr("stockCat_"+c); }
 
   var ICONS = {
+    wrench: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14.7 6.3a4 4 0 0 0-5.6 5.6L2 19l3 3 7.1-7.1a4 4 0 0 0 5.6-5.6l-2.6 2.6-3-3z"/></svg>',
+    box: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>',
     hamburger: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M3 12h18M3 18h18"/></svg>',
     dashboard: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>',
     calendar: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/><path d="M8 2v4"/><path d="M16 2v4"/></svg>',
@@ -401,6 +446,16 @@
         { id: uid(), date: iso(8), description: "Housekeeping — weekly clean", category: "Cleaning", amount: 60000, paymentMethod: "Mobile money", supplier: "", notes: "", isDemo: true },
         { id: uid(), date: iso(13), description: "Water bill", category: "Water", amount: 45000, paymentMethod: "Bank transfer", supplier: "JIRAMA", notes: "", isDemo: true },
         { id: uid(), date: iso(20), description: "Gardener — monthly", category: "Gardening", amount: 70000, paymentMethod: "Cash", supplier: "", notes: "", isDemo: true }
+      ],
+      maintenanceItems: [
+        { id: uid(), room: "bungalow1", description: "Air conditioning unit making noise", dateReported: iso(5), status: "Done", dateCompleted: iso(6), notes: "Technician cleaned the filter", isDemo: true },
+        { id: uid(), room: "villa2", description: "Bathroom tap dripping", dateReported: iso(14), status: "InProgress", dateCompleted: "", notes: "Waiting for spare part", isDemo: true },
+        { id: uid(), room: "common", description: "Pool pump inspection", dateReported: iso(18), status: "Todo", dateCompleted: "", notes: "", isDemo: true }
+      ],
+      stockItems: [
+        { id: uid(), name: "Bath towels", category: "Linens", quantity: 6, unit: "pieces", threshold: 8, notes: "", isDemo: true },
+        { id: uid(), name: "Dish soap", category: "Kitchen", quantity: 3, unit: "bottles", threshold: 2, notes: "", isDemo: true },
+        { id: uid(), name: "Toilet paper", category: "Toiletries", quantity: 4, unit: "packs", threshold: 5, notes: "", isDemo: true }
       ],
       monthlyNotes: {}
     };
@@ -468,6 +523,8 @@
   function fillDefaults(obj){
     if (!obj.categories) obj.categories = EXPENSE_CATEGORIES_DEFAULT.slice();
     if (!obj.monthlyNotes) obj.monthlyNotes = {};
+    if (!obj.maintenanceItems) obj.maintenanceItems = [];
+    if (!obj.stockItems) obj.stockItems = [];
     if (!obj.lastModified) obj.lastModified = null;
     return obj;
   }
@@ -653,6 +710,8 @@
       ["calendar","nav_calendar","calendar"],
       ["stays","nav_stays","stays"],
       ["expenses","nav_expenses","expenses"],
+      ["maintenance","nav_maintenance","wrench"],
+      ["stock","nav_stock","box"],
       ["reports","nav_reports","reports"],
       ["settings","nav_settings","settings"]
     ];
@@ -665,10 +724,12 @@
     else if (state.tab==="calendar") content = calendarHTML(d);
     else if (state.tab==="stays") content = staysHTML(d);
     else if (state.tab==="expenses") content = expensesHTML(d);
+    else if (state.tab==="maintenance") content = maintenanceHTML(d);
+    else if (state.tab==="stock") content = stockHTML(d);
     else if (state.tab==="reports") content = reportsHTML(d);
     else if (state.tab==="settings") content = settingsHTML(d);
 
-    var hasDemo = d.stays.some(function(s){return s.isDemo;}) || d.expenses.some(function(e){return e.isDemo;});
+    var hasDemo = d.stays.some(function(s){return s.isDemo;}) || d.expenses.some(function(e){return e.isDemo;}) || (d.maintenanceItems||[]).some(function(m){return m.isDemo;}) || (d.stockItems||[]).some(function(x){return x.isDemo;});
     var banner = hasDemo ? '<div class="demo-banner"><span>'+tr("demoBanner")+'</span><button class="btn small subtle" data-action="clear-demo">'+tr("removeDemoData")+'</button></div>' : "";
 
     root.innerHTML =
@@ -737,6 +798,16 @@
     var arrHTML = upcomingArrivals.length ? upcomingArrivals.map(function(st){ return rowLine(esc(st.guestName), fmtDate(st.arrival)); }).join("") : '<p class="empty">'+tr("noUpcomingArrivals")+'</p>';
     var depHTML = upcomingDepartures.length ? upcomingDepartures.map(function(st){ return rowLine(esc(st.guestName), fmtDate(st.departure)); }).join("") : '<p class="empty">'+tr("noUpcomingDepartures")+'</p>';
 
+    var pendingMaint = (d.maintenanceItems||[]).filter(function(m){ return m.status!=="Done"; }).sort(function(a,b){ return a.dateReported<b.dateReported?1:-1; });
+    var maintHTML = pendingMaint.length ? pendingMaint.slice(0,5).map(function(m){
+      return rowLine(trRoom(m.room)+' — '+esc(m.description), '<span class="status-pill status-'+m.status+'">'+trMaintStatus(m.status)+'</span>');
+    }).join("") : '<p class="empty">'+tr("noMaintenancePending")+'</p>';
+
+    var lowStock = (d.stockItems||[]).filter(function(it){ return it.quantity<=it.threshold; });
+    var toBuyHTML = lowStock.length ? lowStock.slice(0,5).map(function(it){
+      return rowLine(esc(it.name), it.quantity+' / '+it.threshold+(it.unit?' '+esc(it.unit):''));
+    }).join("") : '<p class="empty">'+tr("noToBuy")+'</p>';
+
     return '<div class="page-head"><div><h1 class="page-title">'+tr("dash_title")+'</h1><p class="page-sub">'+fmtDate(todayISO())+'</p></div></div>' +
       '<div class="stat-grid">' +
         statCard(tr("statNightsOccupied"), s.nightsOccupied) +
@@ -757,10 +828,12 @@
             rowLine(tr("highestCategory"), s.highestCategory ? trCategory(s.highestCategory)+" — "+fmtAr(s.highestAmt) : "—") +
             rowLine(tr("changeVsPrevMonth"), deltaText) +
           '</div>' +
+          '<div class="panel"><div class="panel-title">'+tr("panelToBuy")+'</div>' + toBuyHTML + '</div>' +
         '</div>' +
         '<div>' +
           '<div class="panel"><div class="panel-title">'+tr("panelUpcomingArrivals")+'</div>' + arrHTML + '</div>' +
           '<div class="panel"><div class="panel-title">'+tr("panelUpcomingDepartures")+'</div>' + depHTML + '</div>' +
+          '<div class="panel"><div class="panel-title">'+tr("panelMaintenance")+'</div>' + maintHTML + '</div>' +
         '</div>' +
       '</div>';
   }
@@ -860,6 +933,52 @@
           '<div class="panel"><div class="panel-title">'+tr("byCategory")+'</div>' + (bars || '<p class="empty">'+tr("noDataYet")+'</p>') + '</div>' +
         '</div>' +
       '</div>';
+  }
+
+  function maintenanceHTML(d){
+    var items = (d.maintenanceItems||[]).slice().sort(function(a,b){
+      var order = {Todo:0, InProgress:1, Done:2};
+      if (order[a.status]!==order[b.status]) return order[a.status]-order[b.status];
+      return a.dateReported<b.dateReported?1:-1;
+    });
+    var rows = items.map(function(it){
+      return '<tr><td>'+trRoom(it.room)+'</td><td>'+esc(it.description)+'</td><td>'+fmtDate(it.dateReported)+'</td>' +
+        '<td><span class="status-pill status-'+it.status+'">'+trMaintStatus(it.status)+'</span></td>' +
+        '<td>'+(it.dateCompleted?fmtDate(it.dateCompleted):"—")+'</td>' +
+        '<td class="row-actions"><button class="icon-btn" data-action="edit-maintenance" data-id="'+it.id+'">'+ICONS.edit+'</button>' +
+        '<button class="icon-btn" data-action="ask-delete-maintenance" data-id="'+it.id+'">'+ICONS.trash+'</button></td></tr>';
+    }).join("");
+
+    return '<div class="page-head"><div><h1 class="page-title">'+tr("maint_title")+'</h1><p class="page-sub">'+tr("maint_sub")+'</p></div>' +
+      '<button class="btn" data-action="new-maintenance">'+ICONS.plus+' '+tr("addMaintenance")+'</button></div>' +
+      '<div class="table-wrap"><table><thead><tr><th>'+tr("thRoom")+'</th><th>'+tr("thDescription")+'</th><th>'+tr("thDateReported")+'</th><th>'+tr("thMaintStatus")+'</th><th>'+tr("thDateCompleted")+'</th><th></th></tr></thead><tbody>' +
+      (rows || '<tr><td colspan="6" class="empty">'+tr("noMaintenance")+'</td></tr>') + '</tbody></table></div>';
+  }
+
+  function stockHTML(d){
+    var items = (d.stockItems||[]).slice().sort(function(a,b){
+      var aLow = a.quantity<=a.threshold, bLow = b.quantity<=b.threshold;
+      if (aLow!==bLow) return aLow?-1:1;
+      return a.name.localeCompare(b.name);
+    });
+    var rows = items.map(function(it){
+      var low = it.quantity<=it.threshold;
+      return '<tr><td>'+esc(it.name)+'</td><td>'+trStockCategory(it.category)+'</td>' +
+        '<td class="row-actions" style="justify-content:flex-start;align-items:center;gap:8px">' +
+          '<button class="icon-btn" data-action="stock-dec" data-id="'+it.id+'">−</button>' +
+          '<strong>'+it.quantity+'</strong>' +
+          '<button class="icon-btn" data-action="stock-inc" data-id="'+it.id+'">+</button>' +
+        '</td>' +
+        '<td>'+esc(it.unit||"—")+'</td><td>'+it.threshold+'</td>' +
+        '<td><span class="status-pill status-'+(low?"Todo":"Done")+'">'+(low?tr("stockToBuy"):tr("stockOk"))+'</span></td>' +
+        '<td class="row-actions"><button class="icon-btn" data-action="edit-stock" data-id="'+it.id+'">'+ICONS.edit+'</button>' +
+        '<button class="icon-btn" data-action="ask-delete-stock" data-id="'+it.id+'">'+ICONS.trash+'</button></td></tr>';
+    }).join("");
+
+    return '<div class="page-head"><div><h1 class="page-title">'+tr("stock_title")+'</h1><p class="page-sub">'+tr("stock_sub")+'</p></div>' +
+      '<button class="btn" data-action="new-stock">'+ICONS.plus+' '+tr("addStockItem")+'</button></div>' +
+      '<div class="table-wrap"><table><thead><tr><th>'+tr("thItem")+'</th><th>'+tr("thStockCategory")+'</th><th>'+tr("thQuantity")+'</th><th>'+tr("thUnit")+'</th><th>'+tr("thThreshold")+'</th><th>'+tr("thStockStatus")+'</th><th></th></tr></thead><tbody>' +
+      (rows || '<tr><td colspan="7" class="empty">'+tr("noStock")+'</td></tr>') + '</tbody></table></div>';
   }
 
   function reportsHTML(d){
@@ -1063,6 +1182,45 @@
         '</form>' +
       '</div></div>';
     }
+    if (state.modal.type==="maintenance"){
+      var mi = state.modal.editId ? (d.maintenanceItems||[]).find(function(x){ return x.id===state.modal.editId; }) : null;
+      var roomOpts = MAINT_ROOMS.map(function(r){ return '<option value="'+r+'"'+(mi&&mi.room===r?' selected':'')+'>'+trRoom(r)+'</option>'; }).join("");
+      var mStatOpts = MAINT_STATUSES.map(function(st){ return '<option value="'+st+'"'+(mi&&mi.status===st?' selected':(!mi&&st==="Todo"?' selected':''))+'>'+trMaintStatus(st)+'</option>'; }).join("");
+      return '<div class="modal-overlay" id="modalOverlay"><div class="modal-box">' +
+        '<div class="modal-head"><h3>'+(mi?tr("modalEditMaintenance"):tr("modalAddMaintenance"))+'</h3><button class="icon-btn" id="modalClose">'+ICONS.x+'</button></div>' +
+        '<form id="maintenanceForm" data-form="maintenance">' +
+          '<input type="hidden" name="id" value="'+(mi?mi.id:"")+'" />' +
+          '<div class="form-grid single"><label class="field">'+tr("thRoom")+'<select name="room">'+roomOpts+'</select></label></div>' +
+          '<div class="form-grid single"><label class="field">'+tr("description")+'<input type="text" name="description" value="'+(mi?esc(mi.description):"")+'" required /></label></div>' +
+          '<div class="form-grid">' +
+            '<label class="field">'+tr("dateReported")+'<input type="date" name="dateReported" value="'+(mi?mi.dateReported:todayISO())+'" required /></label>' +
+            '<label class="field">'+tr("thMaintStatus")+'<select name="status">'+mStatOpts+'</select></label>' +
+          '</div>' +
+          '<div class="form-grid single"><label class="field">'+tr("dateCompleted")+'<input type="date" name="dateCompleted" value="'+(mi?mi.dateCompleted||"":"")+'" /></label></div>' +
+          '<div class="form-grid single"><label class="field">'+tr("notes")+'<textarea name="notes">'+(mi?esc(mi.notes||""):"")+'</textarea></label></div>' +
+          '<div class="modal-actions"><button type="button" class="btn secondary" id="modalCancel">'+tr("cancel")+'</button><button type="submit" class="btn">'+(mi?tr("saveChanges"):tr("addMaintenance"))+'</button></div>' +
+        '</form>' +
+      '</div></div>';
+    }
+    if (state.modal.type==="stock"){
+      var si = state.modal.editId ? (d.stockItems||[]).find(function(x){ return x.id===state.modal.editId; }) : null;
+      var stCatOpts = STOCK_CATEGORIES.map(function(c){ return '<option value="'+c+'"'+(si&&si.category===c?' selected':'')+'>'+trStockCategory(c)+'</option>'; }).join("");
+      return '<div class="modal-overlay" id="modalOverlay"><div class="modal-box">' +
+        '<div class="modal-head"><h3>'+(si?tr("modalEditStock"):tr("modalAddStock"))+'</h3><button class="icon-btn" id="modalClose">'+ICONS.x+'</button></div>' +
+        '<form id="stockForm" data-form="stock">' +
+          '<input type="hidden" name="id" value="'+(si?si.id:"")+'" />' +
+          '<div class="form-grid single"><label class="field">'+tr("itemName")+'<input type="text" name="name" value="'+(si?esc(si.name):"")+'" required /></label></div>' +
+          '<div class="form-grid single"><label class="field">'+tr("thStockCategory")+'<select name="category">'+stCatOpts+'</select></label></div>' +
+          '<div class="form-grid">' +
+            '<label class="field">'+tr("quantity")+'<input type="number" name="quantity" min="0" value="'+(si?si.quantity:0)+'" required /></label>' +
+            '<label class="field">'+tr("threshold")+'<input type="number" name="threshold" min="0" value="'+(si?si.threshold:1)+'" required /></label>' +
+          '</div>' +
+          '<div class="form-grid single"><label class="field">'+tr("unit")+'<input type="text" name="unit" value="'+(si?esc(si.unit||""):"")+'" /></label></div>' +
+          '<div class="form-grid single"><label class="field">'+tr("notes")+'<textarea name="notes">'+(si?esc(si.notes||""):"")+'</textarea></label></div>' +
+          '<div class="modal-actions"><button type="button" class="btn secondary" id="modalCancel">'+tr("cancel")+'</button><button type="submit" class="btn">'+(si?tr("saveChanges"):tr("addStockItem"))+'</button></div>' +
+        '</form>' +
+      '</div></div>';
+    }
     return "";
   }
   function bindModal(d){
@@ -1119,6 +1277,8 @@
       state.confirmAction = null;
       if (action.type==="delete-stay") update({ stays: state.data.stays.filter(function(s){ return s.id!==action.id; }) });
       else if (action.type==="delete-expense") update({ expenses: state.data.expenses.filter(function(e){ return e.id!==action.id; }) });
+      else if (action.type==="delete-maintenance") update({ maintenanceItems: (state.data.maintenanceItems||[]).filter(function(m){ return m.id!==action.id; }) });
+      else if (action.type==="delete-stock") update({ stockItems: (state.data.stockItems||[]).filter(function(x){ return x.id!==action.id; }) });
       else render();
     });
   }
@@ -1169,10 +1329,22 @@
     else if (action==="new-expense"){ state.modal = { type:"expense", editId:null }; render(); }
     else if (action==="edit-expense"){ state.modal = { type:"expense", editId:id }; render(); }
     else if (action==="ask-delete-expense"){ state.confirmAction = { type:"delete-expense", id:id }; render(); }
+    else if (action==="new-maintenance"){ state.modal = { type:"maintenance", editId:null }; render(); }
+    else if (action==="edit-maintenance"){ state.modal = { type:"maintenance", editId:id }; render(); }
+    else if (action==="ask-delete-maintenance"){ state.confirmAction = { type:"delete-maintenance", id:id }; render(); }
+    else if (action==="new-stock"){ state.modal = { type:"stock", editId:null }; render(); }
+    else if (action==="edit-stock"){ state.modal = { type:"stock", editId:id }; render(); }
+    else if (action==="ask-delete-stock"){ state.confirmAction = { type:"delete-stock", id:id }; render(); }
+    else if (action==="stock-inc" || action==="stock-dec"){
+      var delta = action==="stock-inc" ? 1 : -1;
+      update({ stockItems: (d.stockItems||[]).map(function(it){
+        return it.id===id ? Object.assign({}, it, { quantity: Math.max(0, it.quantity+delta) }) : it;
+      }) });
+    }
     else if (action==="open-report"){ state.reportMonth = el.getAttribute("data-month"); state.tab="reports"; render(); }
     else if (action==="print-report"){ window.print(); }
     else if (action==="clear-demo"){
-      update({ stays: d.stays.filter(function(s){ return !s.isDemo; }), expenses: d.expenses.filter(function(e){ return !e.isDemo; }) });
+      update({ stays: d.stays.filter(function(s){ return !s.isDemo; }), expenses: d.expenses.filter(function(e){ return !e.isDemo; }), maintenanceItems: (d.maintenanceItems||[]).filter(function(m){ return !m.isDemo; }), stockItems: (d.stockItems||[]).filter(function(x){ return !x.isDemo; }) });
     }
     else if (action==="save-residence"){
       var name = document.getElementById("settName").value.trim() || d.residence.name;
@@ -1252,6 +1424,34 @@
         update({ expenses: d.expenses.map(function(e2){ return e2.id===eid ? Object.assign({},e2,payload2) : e2; }) });
       } else {
         update({ expenses: [Object.assign({id:uid(), isDemo:false}, payload2)].concat(d.expenses) });
+      }
+      state.modal = null; render();
+    }
+    else if (type==="maintenance"){
+      var mid = fd.get("id");
+      var payload3 = {
+        room: fd.get("room"), description: fd.get("description"), dateReported: fd.get("dateReported"),
+        status: fd.get("status"), dateCompleted: fd.get("dateCompleted"), notes: fd.get("notes")
+      };
+      var current = d.maintenanceItems || [];
+      if (mid){
+        update({ maintenanceItems: current.map(function(m2){ return m2.id===mid ? Object.assign({},m2,payload3) : m2; }) });
+      } else {
+        update({ maintenanceItems: [Object.assign({id:uid(), isDemo:false}, payload3)].concat(current) });
+      }
+      state.modal = null; render();
+    }
+    else if (type==="stock"){
+      var sid = fd.get("id");
+      var payload4 = {
+        name: fd.get("name"), category: fd.get("category"), quantity: Number(fd.get("quantity"))||0,
+        threshold: Number(fd.get("threshold"))||0, unit: fd.get("unit"), notes: fd.get("notes")
+      };
+      var currentStock = d.stockItems || [];
+      if (sid){
+        update({ stockItems: currentStock.map(function(s2){ return s2.id===sid ? Object.assign({},s2,payload4) : s2; }) });
+      } else {
+        update({ stockItems: [Object.assign({id:uid(), isDemo:false}, payload4)].concat(currentStock) });
       }
       state.modal = null; render();
     }

@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Masoandro P8 Home — The Residence</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+  :root {
+    --paper: #FAF8F4;
+    --card: #FFFFFF;
+    --ink: #211F1C;
+    --muted: #8B8577;
+    --line: #E7E2D6;
+    --brass: #9C7A34;
+    --brass-soft: #EFE7D2;
+    --sage: #6E7F63;
+    --sage-soft: #E7ECE3;
+    --wine: #7A3B3B;
+    --wine-soft: #F2E4E1;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--paper); }
+  body { font-family: 'Inter', -apple-system, sans-serif; color: var(--ink); }
+  .app { display: flex; min-height: 100vh; }
+  .loading { width: 100%; display: flex; align-items: center; justify-content: center; padding: 80px 0; color: var(--muted); font-size: 14px; letter-spacing: 0.03em; }
+
+  .sidebar { width: 232px; flex-shrink: 0; background: var(--card); border-right: 1px solid var(--line); display: flex; flex-direction: column; padding: 28px 18px; }
+  .brand { padding: 0 6px 26px; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
+  .brand .mark { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 21px; font-weight: 600; letter-spacing: 0.02em; line-height: 1.25; }
+  .brand .sub { font-size: 10.5px; color: var(--muted); letter-spacing: 0.14em; margin-top: 3px; }
+  .nav { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+  .nav-item { display: flex; align-items: center; gap: 11px; padding: 10px 11px; background: none; border: none; color: var(--muted); font-size: 13px; letter-spacing: 0.01em; text-align: left; border-radius: 6px; cursor: pointer; font-family: inherit; }
+  .nav-item svg { flex-shrink: 0; }
+  .nav-item:hover { color: var(--ink); background: var(--paper); }
+  .nav-item.active { color: var(--ink); background: var(--brass-soft); font-weight: 600; }
+  .lang-switch { display: flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
+  .lang-switch button { flex: 1; background: var(--card); border: none; padding: 7px 0; font-size: 11.5px; font-weight: 600; letter-spacing: 0.04em; color: var(--muted); cursor: pointer; font-family: inherit; }
+  .lang-switch button.active { background: var(--ink); color: #fff; }
+  .sidebar-foot { font-size: 10.5px; color: var(--muted); padding: 0 6px; letter-spacing: 0.02em; }
+
+  .content { flex: 1; padding: 40px 48px; max-width: 1180px; }
+  .page-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; gap: 16px; flex-wrap: wrap; }
+  .page-title { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 32px; font-weight: 600; margin: 0 0 5px; }
+  .page-sub { color: var(--muted); font-size: 13px; margin: 0; }
+  .btn { display: inline-flex; align-items: center; gap: 7px; background: var(--ink); color: #fff; border: none; padding: 10px 18px; border-radius: 5px; font-size: 12.5px; font-weight: 600; cursor: pointer; font-family: inherit; letter-spacing: 0.01em; white-space: nowrap; }
+  .btn:hover { opacity: 0.88; }
+  .btn.secondary { background: var(--card); color: var(--ink); border: 1px solid var(--line); }
+  .btn.subtle { background: transparent; color: var(--muted); border: 1px solid var(--line); }
+  .btn.danger { background: var(--wine); }
+  .btn.small { padding: 7px 12px; font-size: 11.5px; }
+
+  .demo-banner { background: var(--brass-soft); border: 1px solid var(--brass); border-radius: 6px; padding: 12px 16px; font-size: 12.5px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; gap: 12px; flex-wrap: wrap; }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; margin-bottom: 30px; }
+  .stat-card { background: var(--card); padding: 20px 20px; }
+  .stat-value { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 30px; font-weight: 600; line-height: 1; }
+  .stat-label { font-size: 11px; color: var(--muted); margin-top: 7px; letter-spacing: 0.03em; text-transform: uppercase; }
+
+  .two-col { display: grid; grid-template-columns: 1.3fr 1fr; gap: 20px; align-items: start; }
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 22px 24px; margin-bottom: 20px; }
+  .panel-title { font-size: 12.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); margin: 0 0 14px; }
+  .row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 13.5px; gap: 12px; }
+  .row:last-child { border-bottom: none; }
+  .row .tag { color: var(--muted); font-size: 11.5px; }
+  .empty { color: var(--muted); font-size: 13px; font-style: italic; padding: 6px 0; }
+
+  .cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .cal-month-label { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 20px; font-weight: 600; min-width: 190px; text-align: center; }
+  .cal-icon-btn { background: var(--card); border: 1px solid var(--line); border-radius: 5px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ink); }
+  .cal-icon-btn:hover { background: var(--paper); }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .cal-dow { background: var(--card); padding: 9px 0; text-align: center; font-size: 10.5px; letter-spacing: 0.06em; color: var(--muted); text-transform: uppercase; }
+  .cal-day { background: var(--card); min-height: 82px; padding: 7px; cursor: pointer; position: relative; }
+  .cal-day.blank { background: var(--paper); cursor: default; }
+  .cal-day.occupied { background: var(--sage-soft); }
+  .cal-day.today .num { color: #fff; background: var(--ink); border-radius: 50%; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; }
+  .cal-day .num { font-size: 12px; color: var(--ink); }
+  .cal-day .flag { font-size: 9px; margin-top: 4px; font-weight: 600; letter-spacing: 0.03em; padding: 2px 5px; border-radius: 3px; display: inline-block; }
+  .cal-day .flag.arr { background: var(--sage); color: #fff; }
+  .cal-day .flag.dep { background: var(--wine); color: #fff; }
+  .cal-day.selected { outline: 2px solid var(--brass); outline-offset: -2px; }
+  .legend { display: flex; gap: 18px; margin-top: 14px; font-size: 11.5px; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+
+  .table-wrap { background: var(--card); border: 1px solid var(--line); border-radius: 8px; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 12px 16px; color: var(--muted); font-weight: 600; font-size: 10.5px; letter-spacing: 0.04em; text-transform: uppercase; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  td { padding: 12px 16px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  .status-pill { font-size: 10.5px; font-weight: 600; letter-spacing: 0.03em; padding: 3px 9px; border-radius: 20px; text-transform: uppercase; }
+  .status-Confirmed { background: var(--brass-soft); color: var(--brass); }
+  .status-Checked-in { background: var(--sage-soft); color: var(--sage); }
+  .status-Checked-out { background: var(--line); color: var(--muted); }
+  .status-Cancelled { background: var(--wine-soft); color: var(--wine); }
+  .icon-btn { background: none; border: none; color: var(--muted); cursor: pointer; padding: 5px; border-radius: 4px; display: inline-flex; }
+  .icon-btn:hover { color: var(--wine); background: var(--wine-soft); }
+  .row-actions { display: flex; gap: 4px; }
+
+  .modal-overlay { position: fixed; inset: 0; background: rgba(33,31,28,0.45); display: flex; align-items: center; justify-content: center; z-index: 60; padding: 20px; }
+  .modal-box { background: var(--card); border-radius: 10px; padding: 26px 28px; width: 460px; max-width: 100%; max-height: 88vh; overflow-y: auto; }
+  .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+  .modal-head h3 { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600; font-size: 21px; margin: 0; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+  .form-grid.single { grid-template-columns: 1fr; }
+  label.field { display: flex; flex-direction: column; gap: 5px; font-size: 11.5px; color: var(--muted); letter-spacing: 0.01em; }
+  input, select, textarea { background: var(--paper); border: 1px solid var(--line); color: var(--ink); border-radius: 5px; padding: 9px 11px; font-size: 13.5px; outline: none; font-family: inherit; width: 100%; }
+  textarea { resize: vertical; min-height: 60px; }
+  input:focus, select:focus, textarea:focus { border-color: var(--brass); }
+  .nights-preview { background: var(--brass-soft); border-radius: 5px; padding: 8px 11px; font-size: 12.5px; color: var(--brass); font-weight: 600; margin-bottom: 14px; }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px; }
+  .inline-add { display: flex; gap: 8px; margin-top: 10px; }
+  .inline-add input { flex: 1; }
+
+  .month-picker { background: var(--card); border: 1px solid var(--line); color: var(--ink); border-radius: 6px; padding: 9px 12px; font-size: 13px; outline: none; font-family: inherit; }
+
+  .cat-bar-row { margin-bottom: 12px; }
+  .cat-bar-top { display: flex; justify-content: space-between; font-size: 12.5px; margin-bottom: 5px; }
+  .cat-bar-track { height: 7px; background: var(--paper); border-radius: 6px; overflow: hidden; }
+  .cat-bar-fill { height: 100%; background: var(--brass); border-radius: 6px; }
+
+  .summary-text { font-size: 14px; line-height: 1.65; color: var(--ink); background: var(--paper); border-radius: 8px; padding: 18px 20px; border: 1px solid var(--line); }
+  .report-block-title { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--brass); margin: 26px 0 10px; }
+  .report-block-title:first-child { margin-top: 0; }
+
+  .settings-section { margin-bottom: 28px; }
+  .chip-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .chip { display: inline-flex; align-items: center; gap: 7px; background: var(--paper); border: 1px solid var(--line); border-radius: 20px; padding: 6px 8px 6px 13px; font-size: 12px; }
+  .chip button { background: none; border: none; color: var(--muted); cursor: pointer; display: flex; padding: 2px; }
+  .chip button:hover { color: var(--wine); }
+
+  @media (max-width: 860px) {
+    .app { flex-direction: column; }
+    .sidebar { width: 100%; flex-direction: row; align-items: center; padding: 14px 16px; flex-wrap: wrap; }
+    .brand { border-bottom: none; padding: 0 10px 0 0; margin-bottom: 0; border-right: 1px solid var(--line); margin-right: 8px; }
+    .nav { flex-direction: row; overflow-x: auto; }
+    .lang-switch { width: 90px; margin-bottom: 0; margin-left: auto; }
+    .sidebar-foot { display: none; }
+    .content { padding: 22px; }
+    .two-col { grid-template-columns: 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+  }
+
+  @media print {
+    body * { visibility: hidden; }
+    #reportPrintArea, #reportPrintArea * { visibility: visible; }
+    #reportPrintArea { position: absolute; left: 0; top: 0; width: 100%; padding: 20px; }
+    .no-print { display: none !important; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+(function(){
+  "use strict";
+
+  var STORAGE_KEY = "masoandro-p8-data-v1";
+  var LANG_KEY = "masoandro-p8-lang";
+
+  var EXPENSE_CATEGORIES_DEFAULT = ["Electricity","Water","Internet","Gas","Cleaning","Laundry","Maintenance","Repairs","Security","Staff","Supplies","Transportation","Gardening","Pool / outdoor maintenance","Other"];
+  var PAYMENT_METHODS = ["Cash","Bank transfer","Card","Mobile money","Other"];
+  var BOOKING_SOURCES = ["Airbnb","Booking.com","Direct","Other"];
+  var STAY_STATUSES = ["Confirmed","Checked-in","Checked-out","Cancelled"];
+
+  // ---------- i18n ----------
+  var T = {
+    en: {
+      nav_dashboard:"Dashboard", nav_calendar:"Calendar", nav_stays:"Stays", nav_expenses:"Expenses", nav_reports:"Monthly Reports", nav_settings:"Settings",
+      sidebarFoot:"Data stored locally in this browser.",
+      demoBanner:"This workspace currently contains demonstration data.", removeDemoData:"Remove demo data",
+      dash_title:"Dashboard",
+      statNightsOccupied:"Nights occupied", statNightsAvailable:"Total nights in month", statOccupancyRate:"Occupancy rate",
+      statStaysThisMonth:"Stays this month", statArrivalsThisMonth:"Arrivals this month", statDeparturesThisMonth:"Departures this month",
+      monthlyOverview:"Monthly Overview", panelExpenses:"Expenses", panelUpcomingArrivals:"Upcoming arrivals", panelUpcomingDepartures:"Upcoming departures",
+      expensesThisMonth:"Expenses this month", numberOfExpenses:"Number of expenses", highestCategory:"Highest category", changeVsPrevMonth:"Change vs previous month",
+      noUpcomingArrivals:"No upcoming arrivals.", noUpcomingDepartures:"No upcoming departures.",
+      dashSummary:function(name,stays,nights,rate,expenses,delta){ return name+" recorded "+stays+" stay"+(stays!==1?"s":"")+" and "+nights+" occupied night"+(nights!==1?"s":"")+" so far this month, for an occupancy rate of "+rate+"%. Total operating expenses amount to "+expenses+" ("+delta+")."; },
+      vsMonth:function(m){ return "vs "+m; },
+      cal_title:"Calendar", cal_sub:"Occupancy overview", today:"Today",
+      legendOccupied:"Occupied", legendFlag:"Arrival / Departure flag", legendToday:"Today",
+      flagArrival:"Arrival", flagDeparture:"Departure", noStayThisDay:"No stay on this day.",
+      stays_title:"Stays", stays_sub:"Reservations and guest check-ins", addStay:"Add stay",
+      thGuest:"Guest", thArrival:"Arrival", thDeparture:"Departure", thNights:"Nights", thGuests:"Guests", thSource:"Source", thStatus:"Status",
+      noStays:"No stays recorded yet.",
+      exp_title:"Expenses", exp_sub:"Operating costs by month", addExpense:"Add expense",
+      thDate:"Date", thDescription:"Description", thCategory:"Category", thSupplier:"Supplier", thAmount:"Amount",
+      noExpensesMonth:"No expenses for this month.", totalMonthlyExpenses:"Total monthly expenses", byCategory:"By category", noDataYet:"No data yet.",
+      rep_title:"Monthly Reports", rep_sub:"Operational summary for the selected month", printExport:"Print / Export PDF",
+      docHeader:"MONTHLY OPERATIONS REPORT",
+      secOccupancy:"Occupancy", secExpenses:"Expenses", secSummary:"Operational Summary", secNotes:"Operational Notes",
+      totalStays:"Total stays", totalNights:"Total nights occupied", occupancyRate:"Occupancy rate", arrivals:"Arrivals", departures:"Departures",
+      totalExpenses:"Total expenses", numExpenses:"Number of expenses",
+      notesPlaceholder:"Add manager notes for this month…",
+      monthlyHistory:"Monthly history", thMonth:"Month", thStaysCol:"Stays", thExpensesCol:"Expenses", reportBtn:"Report", noHistory:"No history yet.",
+      reportSummary:function(name,stays,nights,rate,arr,dep,expenses,count,highest){
+        return name+" recorded "+stays+" stay"+(stays!==1?"s":"")+" and "+nights+" occupied night"+(nights!==1?"s":"")+" this month. The residence had an occupancy rate of "+rate+"%, with "+arr+" arrival"+(arr!==1?"s":"")+" and "+dep+" departure"+(dep!==1?"s":"")+". Total operating expenses amounted to "+expenses+" across "+count+" recorded expense"+(count!==1?"s":"")+(highest?(", with "+highest+" as the largest category."):".");
+      },
+      set_title:"Settings", set_sub:"Residence details and preferences",
+      residence:"Residence", name:"Name", subtitle:"Subtitle", save:"Save",
+      expenseCategories:"Expense categories", newCategoryName:"New category name", add:"Add",
+      dataSection:"Data", dataDesc:"Export a backup of all stays, expenses and settings, or restore from a previous export.",
+      exportData:"Export data (JSON)", importData:"Import data",
+      modalAddStay:"Add stay", modalEditStay:"Edit stay", guestName:"Guest name", arrivalDate:"Arrival date", departureDate:"Departure date",
+      nights:function(n){ return n+" night"+(n!==1?"s":""); },
+      numberOfGuests:"Number of guests", bookingSource:"Booking source", status:"Status", notes:"Notes",
+      cancel:"Cancel", saveChanges:"Save changes",
+      modalAddExpense:"Add expense", modalEditExpense:"Edit expense", amountAr:"Amount (Ar)", description:"Description", category:"Category", paymentMethod:"Payment method", supplier:"Supplier",
+      confirmDeleteTitle:"Delete this entry?", confirmDeleteBody:"This action cannot be undone.", delete:"Delete",
+      importInvalid:"This file could not be read as a valid backup.",
+      status_Confirmed:"Confirmed", status_Checkedin:"Checked-in", status_Checkedout:"Checked-out", status_Cancelled:"Cancelled",
+      src_Direct:"Direct", src_Other:"Other",
+      pay_Cash:"Cash", pay_Banktransfer:"Bank transfer", pay_Card:"Card", pay_Mobilemoney:"Mobile money", pay_Other:"Other",
+      cat_Electricity:"Electricity", cat_Water:"Water", cat_Internet:"Internet", cat_Gas:"Gas", cat_Cleaning:"Cleaning", cat_Laundry:"Laundry",
+      cat_Maintenance:"Maintenance", cat_Repairs:"Repairs", cat_Security:"Security", cat_Staff:"Staff", cat_Supplies:"Supplies",
+      cat_Transportation:"Transportation", cat_Gardening:"Gardening", cat_Pooloutdoormaintenance:"Pool / outdoor maintenance", cat_Other:"Other",
+      months:["January","February","March","April","May","June","July","August","September","October","November","December"],
+      dow:["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],
+      dateLocale:"en-US"
+    },
+    fr: {
+      nav_dashboard:"Tableau de bord", nav_calendar:"Calendrier", nav_stays:"Séjours", nav_expenses:"Dépenses", nav_reports:"Rapports mensuels", nav_settings:"Paramètres",
+      sidebarFoot:"Données stockées localement dans ce navigateur.",
+      demoBanner:"Cet espace contient actuellement des données de démonstration.", removeDemoData:"Supprimer les données de démo",
+      dash_title:"Tableau de bord",
+      statNightsOccupied:"Nuits occupées", statNightsAvailable:"Nuits totales du mois", statOccupancyRate:"Taux d'occupation",
+      statStaysThisMonth:"Séjours ce mois-ci", statArrivalsThisMonth:"Arrivées ce mois-ci", statDeparturesThisMonth:"Départs ce mois-ci",
+      monthlyOverview:"Aperçu mensuel", panelExpenses:"Dépenses", panelUpcomingArrivals:"Arrivées à venir", panelUpcomingDepartures:"Départs à venir",
+      expensesThisMonth:"Dépenses ce mois-ci", numberOfExpenses:"Nombre de dépenses", highestCategory:"Catégorie la plus élevée", changeVsPrevMonth:"Évolution vs mois précédent",
+      noUpcomingArrivals:"Aucune arrivée à venir.", noUpcomingDepartures:"Aucun départ à venir.",
+      dashSummary:function(name,stays,nights,rate,expenses,delta){ return name+" a enregistré "+stays+" séjour"+(stays!==1?"s":"")+" et "+nights+" nuit"+(nights!==1?"s":"")+" occupée"+(nights!==1?"s":"")+" depuis le début du mois, pour un taux d'occupation de "+rate+"%. Les dépenses d'exploitation totales s'élèvent à "+expenses+" ("+delta+")."; },
+      vsMonth:function(m){ return "vs "+m; },
+      cal_title:"Calendrier", cal_sub:"Vue d'ensemble de l'occupation", today:"Aujourd'hui",
+      legendOccupied:"Occupé", legendFlag:"Repère arrivée / départ", legendToday:"Aujourd'hui",
+      flagArrival:"Arrivée", flagDeparture:"Départ", noStayThisDay:"Aucun séjour ce jour-là.",
+      stays_title:"Séjours", stays_sub:"Réservations et arrivées des clients", addStay:"Ajouter un séjour",
+      thGuest:"Client", thArrival:"Arrivée", thDeparture:"Départ", thNights:"Nuits", thGuests:"Personnes", thSource:"Source", thStatus:"Statut",
+      noStays:"Aucun séjour enregistré pour l'instant.",
+      exp_title:"Dépenses", exp_sub:"Coûts d'exploitation par mois", addExpense:"Ajouter une dépense",
+      thDate:"Date", thDescription:"Description", thCategory:"Catégorie", thSupplier:"Fournisseur", thAmount:"Montant",
+      noExpensesMonth:"Aucune dépense pour ce mois.", totalMonthlyExpenses:"Total des dépenses du mois", byCategory:"Par catégorie", noDataYet:"Pas encore de données.",
+      rep_title:"Rapports mensuels", rep_sub:"Résumé opérationnel du mois sélectionné", printExport:"Imprimer / Exporter en PDF",
+      docHeader:"RAPPORT D'EXPLOITATION MENSUEL",
+      secOccupancy:"Occupation", secExpenses:"Dépenses", secSummary:"Résumé opérationnel", secNotes:"Notes opérationnelles",
+      totalStays:"Total des séjours", totalNights:"Total des nuits occupées", occupancyRate:"Taux d'occupation", arrivals:"Arrivées", departures:"Départs",
+      totalExpenses:"Total des dépenses", numExpenses:"Nombre de dépenses",
+      notesPlaceholder:"Ajouter les notes du manager pour ce mois…",
+      monthlyHistory:"Historique mensuel", thMonth:"Mois", thStaysCol:"Séjours", thExpensesCol:"Dépenses", reportBtn:"Rapport", noHistory:"Pas encore d'historique.",
+      reportSummary:function(name,stays,nights,rate,arr,dep,expenses,count,highest){
+        return name+" a enregistré "+stays+" séjour"+(stays!==1?"s":"")+" et "+nights+" nuit"+(nights!==1?"s":"")+" occupée"+(nights!==1?"s":"")+" ce mois-ci. La résidence a affiché un taux d'occupation de "+rate+"%, avec "+arr+" arrivée"+(arr!==1?"s":"")+" et "+dep+" départ"+(dep!==1?"s":"")+". Les dépenses d'exploitation totales se sont élevées à "+expenses+" sur "+count+" dépense"+(count!==1?"s":"")+" enregistrée"+(count!==1?"s":"")+(highest?(", "+highest+" étant la catégorie la plus importante."):".");
+      },
+      set_title:"Paramètres", set_sub:"Détails de la résidence et préférences",
+      residence:"Résidence", name:"Nom", subtitle:"Sous-titre", save:"Enregistrer",
+      expenseCategories:"Catégories de dépenses", newCategoryName:"Nom de la nouvelle catégorie", add:"Ajouter",
+      dataSection:"Données", dataDesc:"Exportez une sauvegarde de tous les séjours, dépenses et paramètres, ou restaurez une sauvegarde précédente.",
+      exportData:"Exporter les données (JSON)", importData:"Importer des données",
+      modalAddStay:"Ajouter un séjour", modalEditStay:"Modifier le séjour", guestName:"Nom du client", arrivalDate:"Date d'arrivée", departureDate:"Date de départ",
+      nights:function(n){ return n+" nuit"+(n!==1?"s":""); },
+      numberOfGuests:"Nombre de personnes", bookingSource:"Source de réservation", status:"Statut", notes:"Notes",
+      cancel:"Annuler", saveChanges:"Enregistrer",
+      modalAddExpense:"Ajouter une dépense", modalEditExpense:"Modifier la dépense", amountAr:"Montant (Ar)", description:"Description", category:"Catégorie", paymentMethod:"Mode de paiement", supplier:"Fournisseur",
+      confirmDeleteTitle:"Supprimer cet élément ?", confirmDeleteBody:"Cette action est irréversible.", delete:"Supprimer",
+      importInvalid:"Ce fichier ne semble pas être une sauvegarde valide.",
+      status_Confirmed:"Confirmé", status_Checkedin:"Arrivé", status_Checkedout:"Parti", status_Cancelled:"Annulé",
+      src_Direct:"Direct", src_Other:"Autre",
+      pay_Cash:"Espèces", pay_Banktransfer:"Virement bancaire", pay_Card:"Carte", pay_Mobilemoney:"Mobile Money", pay_Other:"Autre",
+      cat_Electricity:"Électricité", cat_Water:"Eau", cat_Internet:"Internet", cat_Gas:"Gaz", cat_Cleaning:"Ménage", cat_Laundry:"Blanchisserie",
+      cat_Maintenance:"Entretien", cat_Repairs:"Réparations", cat_Security:"Sécurité", cat_Staff:"Personnel", cat_Supplies:"Fournitures",
+      cat_Transportation:"Transport", cat_Gardening:"Jardinage", cat_Pooloutdoormaintenance:"Piscine / extérieur", cat_Other:"Autre",
+      months:["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"],
+      dow:["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"],
+      dateLocale:"fr-FR"
+    }
+  };
+
+  function tr(key){ var d = T[state.lang] || T.fr; var v = d[key]; return v===undefined ? (T.en[key]!==undefined?T.en[key]:key) : v; }
+  function trStatus(s){ return tr("status_"+s.replace(/[^A-Za-z]/g,"")); }
+  function trSource(s){ if (s==="Direct") return tr("src_Direct"); if (s==="Other") return tr("src_Other"); return s; }
+  function trPayment(p){ return tr("pay_"+p.replace(/[^A-Za-z]/g,"")); }
+  function trCategory(c){ var key = "cat_"+c.replace(/[^A-Za-z]/g,""); var d = T[state.lang]||T.fr; return d[key]!==undefined ? d[key] : c; }
+
+  var ICONS = {
+    dashboard: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>',
+    calendar: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/><path d="M8 2v4"/><path d="M16 2v4"/></svg>',
+    stays: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg>',
+    expenses: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5h-4a2 2 0 0 1 0-4z"/></svg>',
+    reports: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 19V5a1 1 0 0 1 1-1h10l5 5v10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M9 13h6M9 17h6M9 9h2"/></svg>',
+    settings: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.55V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1z"/></svg>',
+    plus: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>',
+    edit: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
+    trash: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>',
+    x: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>',
+    chevLeft: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>',
+    chevRight: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>',
+    print: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>',
+    download: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>',
+    upload: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>'
+  };
+
+  function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+  function todayISO(){ return new Date().toISOString().slice(0,10); }
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+  function fmtAr(n){ return (Number(n)||0).toLocaleString("en-US",{maximumFractionDigits:0}) + " Ar"; }
+  function fmtDate(d){ if(!d) return "—"; var dt = new Date(d+"T00:00:00"); return dt.toLocaleDateString(tr("dateLocale"),{day:"2-digit",month:"short",year:"numeric"}); }
+  function nightsBetween(a,b){ if(!a||!b) return 0; var ms = new Date(b+"T00:00:00")-new Date(a+"T00:00:00"); return Math.max(0, Math.round(ms/86400000)); }
+  function monthKeyOf(dateStr){ return dateStr.slice(0,7); }
+  function pad2(n){ return n<10?"0"+n:""+n; }
+
+  function nightsInMonth(stay, year, monthIdx0){
+    var monthStart = new Date(year, monthIdx0, 1);
+    var monthEnd = new Date(year, monthIdx0+1, 1);
+    var arr = new Date(stay.arrival+"T00:00:00");
+    var dep = new Date(stay.departure+"T00:00:00");
+    var start = arr > monthStart ? arr : monthStart;
+    var end = dep < monthEnd ? dep : monthEnd;
+    var diff = Math.round((end-start)/86400000);
+    return Math.max(0, diff);
+  }
+
+  function seedData(){
+    var y = new Date().getFullYear(), m = new Date().getMonth();
+    function iso(day){ return y+"-"+pad2(m+1)+"-"+pad2(day); }
+    return {
+      residence: { name: "Masoandro P8 Home", subtitle: "The Residence" },
+      categories: EXPENSE_CATEGORIES_DEFAULT.slice(),
+      stays: [
+        { id: uid(), guestName: "L. Andrianasolo", arrival: iso(3), departure: iso(7), guests: 2, source: "Airbnb", status: "Checked-out", notes: "", isDemo: true },
+        { id: uid(), guestName: "R. Rakoto", arrival: iso(9), departure: iso(12), guests: 3, source: "Direct", status: "Checked-out", notes: "", isDemo: true },
+        { id: uid(), guestName: "M. Dubois", arrival: iso(15), departure: iso(20), guests: 2, source: "Booking.com", status: "Checked-in", notes: "Late check-in requested", isDemo: true },
+        { id: uid(), guestName: "T. Randria", arrival: iso(24), departure: iso(28), guests: 4, source: "Airbnb", status: "Confirmed", notes: "", isDemo: true }
+      ],
+      expenses: [
+        { id: uid(), date: iso(2), description: "Monthly electricity bill", category: "Electricity", amount: 180000, paymentMethod: "Bank transfer", supplier: "JIRAMA", notes: "", isDemo: true },
+        { id: uid(), date: iso(4), description: "Pool maintenance visit", category: "Pool / outdoor maintenance", amount: 95000, paymentMethod: "Cash", supplier: "", notes: "", isDemo: true },
+        { id: uid(), date: iso(8), description: "Housekeeping — weekly clean", category: "Cleaning", amount: 60000, paymentMethod: "Mobile money", supplier: "", notes: "", isDemo: true },
+        { id: uid(), date: iso(13), description: "Water bill", category: "Water", amount: 45000, paymentMethod: "Bank transfer", supplier: "JIRAMA", notes: "", isDemo: true },
+        { id: uid(), date: iso(20), description: "Gardener — monthly", category: "Gardening", amount: 70000, paymentMethod: "Cash", supplier: "", notes: "", isDemo: true }
+      ],
+      monthlyNotes: {}
+    };
+  }
+
+  var state = {
+    data: null, loading: true,
+    lang: (function(){ try { return localStorage.getItem(LANG_KEY) || "fr"; } catch(e){ return "fr"; } })(),
+    tab: "dashboard",
+    calendarMonth: todayISO().slice(0,7),
+    selectedDay: null,
+    reportMonth: todayISO().slice(0,7),
+    expensesMonth: todayISO().slice(0,7),
+    modal: null,
+    confirmAction: null
+  };
+
+  function loadData(){
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      state.data = raw ? JSON.parse(raw) : seedData();
+      if (!state.data.categories) state.data.categories = EXPENSE_CATEGORIES_DEFAULT.slice();
+      if (!state.data.monthlyNotes) state.data.monthlyNotes = {};
+    } catch(e){ state.data = seedData(); }
+    state.loading = false;
+    render();
+  }
+  function save(){
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data)); } catch(e){}
+  }
+  function saveLang(){
+    try { localStorage.setItem(LANG_KEY, state.lang); } catch(e){}
+  }
+  function update(patch){ state.data = Object.assign({}, state.data, patch); save(); render(); }
+
+  var root = document.getElementById("root");
+
+  function render(){
+    if (state.loading || !state.data){
+      root.innerHTML = '<div class="loading">…</div>';
+      return;
+    }
+    var d = state.data;
+    var nav = [
+      ["dashboard","nav_dashboard","dashboard"],
+      ["calendar","nav_calendar","calendar"],
+      ["stays","nav_stays","stays"],
+      ["expenses","nav_expenses","expenses"],
+      ["reports","nav_reports","reports"],
+      ["settings","nav_settings","settings"]
+    ];
+    var navHTML = nav.map(function(n){
+      return '<button class="nav-item'+(state.tab===n[0]?' active':'')+'" data-action="tab" data-tab="'+n[0]+'">'+ICONS[n[2]]+'<span>'+tr(n[1])+'</span></button>';
+    }).join("");
+
+    var content = "";
+    if (state.tab==="dashboard") content = dashboardHTML(d);
+    else if (state.tab==="calendar") content = calendarHTML(d);
+    else if (state.tab==="stays") content = staysHTML(d);
+    else if (state.tab==="expenses") content = expensesHTML(d);
+    else if (state.tab==="reports") content = reportsHTML(d);
+    else if (state.tab==="settings") content = settingsHTML(d);
+
+    var hasDemo = d.stays.some(function(s){return s.isDemo;}) || d.expenses.some(function(e){return e.isDemo;});
+    var banner = hasDemo ? '<div class="demo-banner"><span>'+tr("demoBanner")+'</span><button class="btn small subtle" data-action="clear-demo">'+tr("removeDemoData")+'</button></div>' : "";
+
+    root.innerHTML =
+      '<div class="app">' +
+        '<aside class="sidebar">' +
+          '<div class="brand"><div class="mark">'+esc(d.residence.name)+'</div><div class="sub">'+esc((d.residence.subtitle||"").toUpperCase())+'</div></div>' +
+          '<nav class="nav">' + navHTML + '</nav>' +
+          '<div class="lang-switch"><button class="'+(state.lang==="fr"?"active":"")+'" data-action="lang" data-lang="fr">FR</button><button class="'+(state.lang==="en"?"active":"")+'" data-action="lang" data-lang="en">EN</button></div>' +
+          '<div class="sidebar-foot">'+tr("sidebarFoot")+'</div>' +
+        '</aside>' +
+        '<main class="content">' + banner + content + '</main>' +
+      '</div>' +
+      (state.modal ? modalHTML(d) : "") +
+      (state.confirmAction ? confirmHTML() : "");
+
+    if (state.modal) bindModal(d);
+    if (state.confirmAction) bindConfirm();
+  }
+
+  function statCard(label, value){ return '<div class="stat-card"><div class="stat-value">'+value+'</div><div class="stat-label">'+esc(label)+'</div></div>'; }
+  function rowLine(left,right,tag){ return '<div class="row"><span>'+left+(tag?' <span class="tag">'+tag+'</span>':'')+'</span><span>'+right+'</span></div>'; }
+
+  function computeMonthStats(d, monthKey){
+    var parts = monthKey.split("-"); var y = Number(parts[0]), m = Number(parts[1]);
+    var daysInMonth = new Date(y, m, 0).getDate();
+    var staysArriving = d.stays.filter(function(s){ return s.status!=="Cancelled" && monthKeyOf(s.arrival)===monthKey; });
+    var staysDeparting = d.stays.filter(function(s){ return s.status!=="Cancelled" && monthKeyOf(s.departure)===monthKey; });
+    var overlapping = d.stays.filter(function(s){ return s.status!=="Cancelled" && nightsInMonth(s,y,m-1) > 0; });
+    var nightsOccupied = overlapping.reduce(function(sum,s){ return sum + nightsInMonth(s,y,m-1); },0);
+    var occupancyRate = daysInMonth ? Math.min(100, Math.round((nightsOccupied/daysInMonth)*100)) : 0;
+    var monthExpenses = d.expenses.filter(function(e){ return monthKeyOf(e.date)===monthKey; });
+    var totalExpenses = monthExpenses.reduce(function(s,e){ return s+e.amount; },0);
+    var byCategory = {};
+    monthExpenses.forEach(function(e){ byCategory[e.category] = (byCategory[e.category]||0)+e.amount; });
+    var highestCategory = null, highestAmt = -1;
+    Object.keys(byCategory).forEach(function(c){ if (byCategory[c]>highestAmt){ highestAmt=byCategory[c]; highestCategory=c; } });
+    return {
+      y:y, m:m, daysInMonth:daysInMonth, staysArriving:staysArriving, staysDeparting:staysDeparting,
+      staysCount: overlapping.length, nightsOccupied:nightsOccupied, occupancyRate:occupancyRate,
+      monthExpenses:monthExpenses, totalExpenses:totalExpenses, byCategory:byCategory,
+      highestCategory:highestCategory, highestAmt: highestAmt<0?0:highestAmt
+    };
+  }
+
+  function dashboardHTML(d){
+    var now = new Date();
+    var monthKey = now.getFullYear()+"-"+pad2(now.getMonth()+1);
+    var s = computeMonthStats(d, monthKey);
+    var prevDate = new Date(now.getFullYear(), now.getMonth()-1, 1);
+    var prevKey = prevDate.getFullYear()+"-"+pad2(prevDate.getMonth()+1);
+    var prevStats = computeMonthStats(d, prevKey);
+    var delta = prevStats.totalExpenses ? Math.round(((s.totalExpenses-prevStats.totalExpenses)/prevStats.totalExpenses)*100) : (s.totalExpenses>0?100:0);
+    var deltaText = (delta>=0?"+":"") + delta + "% " + tr("vsMonth")(tr("months")[prevStats.m-1].slice(0,3));
+
+    var upcomingArrivals = d.stays.filter(function(st){ return st.status!=="Cancelled" && st.status!=="Checked-out" && st.arrival >= todayISO(); }).sort(function(a,b){ return a.arrival<b.arrival?-1:1; }).slice(0,5);
+    var upcomingDepartures = d.stays.filter(function(st){ return st.status!=="Cancelled" && st.status!=="Checked-out" && st.departure >= todayISO(); }).sort(function(a,b){ return a.departure<b.departure?-1:1; }).slice(0,5);
+
+    var arrHTML = upcomingArrivals.length ? upcomingArrivals.map(function(st){ return rowLine(esc(st.guestName), fmtDate(st.arrival)); }).join("") : '<p class="empty">'+tr("noUpcomingArrivals")+'</p>';
+    var depHTML = upcomingDepartures.length ? upcomingDepartures.map(function(st){ return rowLine(esc(st.guestName), fmtDate(st.departure)); }).join("") : '<p class="empty">'+tr("noUpcomingDepartures")+'</p>';
+
+    return '<div class="page-head"><div><h1 class="page-title">'+tr("dash_title")+'</h1><p class="page-sub">'+fmtDate(todayISO())+'</p></div></div>' +
+      '<div class="stat-grid">' +
+        statCard(tr("statNightsOccupied"), s.nightsOccupied) +
+        statCard(tr("statNightsAvailable"), s.daysInMonth) +
+        statCard(tr("statOccupancyRate"), s.occupancyRate+"%") +
+        statCard(tr("statStaysThisMonth"), s.staysCount) +
+        statCard(tr("statArrivalsThisMonth"), s.staysArriving.length) +
+        statCard(tr("statDeparturesThisMonth"), s.staysDeparting.length) +
+      '</div>' +
+      '<div class="two-col">' +
+        '<div>' +
+          '<div class="panel"><div class="panel-title">'+tr("monthlyOverview")+' — '+tr("months")[s.m-1]+' '+s.y+'</div>' +
+            '<div class="summary-text">' + tr("dashSummary")(esc(d.residence.name), s.staysCount, s.nightsOccupied, s.occupancyRate, fmtAr(s.totalExpenses), deltaText) + '</div>' +
+          '</div>' +
+          '<div class="panel"><div class="panel-title">'+tr("panelExpenses")+'</div>' +
+            rowLine(tr("expensesThisMonth"), fmtAr(s.totalExpenses)) +
+            rowLine(tr("numberOfExpenses"), s.monthExpenses.length) +
+            rowLine(tr("highestCategory"), s.highestCategory ? trCategory(s.highestCategory)+" — "+fmtAr(s.highestAmt) : "—") +
+            rowLine(tr("changeVsPrevMonth"), deltaText) +
+          '</div>' +
+        '</div>' +
+        '<div>' +
+          '<div class="panel"><div class="panel-title">'+tr("panelUpcomingArrivals")+'</div>' + arrHTML + '</div>' +
+          '<div class="panel"><div class="panel-title">'+tr("panelUpcomingDepartures")+'</div>' + depHTML + '</div>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function calendarHTML(d){
+    var parts = state.calendarMonth.split("-"); var y = Number(parts[0]), m = Number(parts[1]);
+    var firstDow = (new Date(y, m-1, 1).getDay()+6)%7;
+    var daysInMonth = new Date(y, m, 0).getDate();
+    var todayStr = todayISO();
+
+    function stayOnDay(dateStr){
+      return d.stays.filter(function(s){ return s.status!=="Cancelled" && dateStr>=s.arrival && dateStr<s.departure; });
+    }
+
+    var cells = "";
+    for (var i=0;i<firstDow;i++) cells += '<div class="cal-day blank"></div>';
+    for (var day=1; day<=daysInMonth; day++){
+      var dateStr = y+"-"+pad2(m)+"-"+pad2(day);
+      var occ = stayOnDay(dateStr);
+      var isArr = d.stays.some(function(s){ return s.status!=="Cancelled" && s.arrival===dateStr; });
+      var isDep = d.stays.some(function(s){ return s.status!=="Cancelled" && s.departure===dateStr; });
+      var cls = "cal-day" + (occ.length?" occupied":"") + (dateStr===todayStr?" today":"") + (dateStr===state.selectedDay?" selected":"");
+      var flags = "";
+      if (isArr) flags += '<span class="flag arr">'+tr("flagArrival")+'</span> ';
+      if (isDep) flags += '<span class="flag dep">'+tr("flagDeparture")+'</span>';
+      cells += '<div class="'+cls+'" data-action="pick-day" data-date="'+dateStr+'"><span class="num">'+day+'</span><div>'+flags+'</div></div>';
+    }
+
+    var monthLabel = tr("months")[m-1] + " " + y;
+    var detail = "";
+    if (state.selectedDay){
+      var dayStays = stayOnDay(state.selectedDay);
+      detail = '<div class="panel"><div class="panel-title">'+fmtDate(state.selectedDay)+'</div>' +
+        (dayStays.length ? dayStays.map(function(s){
+          return rowLine('<strong>'+esc(s.guestName)+'</strong>', fmtDate(s.arrival)+' → '+fmtDate(s.departure), trStatus(s.status));
+        }).join("") : '<p class="empty">'+tr("noStayThisDay")+'</p>') +
+      '</div>';
+    }
+
+    return '<div class="page-head"><div><h1 class="page-title">'+tr("cal_title")+'</h1><p class="page-sub">'+tr("cal_sub")+'</p></div>' +
+      '<button class="btn secondary small" data-action="cal-today">'+tr("today")+'</button></div>' +
+      '<div class="panel">' +
+        '<div class="cal-head"><button class="cal-icon-btn" data-action="cal-prev">'+ICONS.chevLeft+'</button>' +
+        '<div class="cal-month-label">'+monthLabel+'</div>' +
+        '<button class="cal-icon-btn" data-action="cal-next">'+ICONS.chevRight+'</button></div>' +
+        '<div class="cal-grid">' + tr("dow").map(function(x){ return '<div class="cal-dow">'+x+'</div>'; }).join("") + cells + '</div>' +
+        '<div class="legend"><span><i style="background:var(--sage-soft);border:1px solid var(--sage)"></i>'+tr("legendOccupied")+'</span>' +
+        '<span><i style="background:var(--sage)"></i>'+tr("legendFlag")+'</span>' +
+        '<span><i style="background:var(--ink)"></i>'+tr("legendToday")+'</span></div>' +
+      '</div>' +
+      detail;
+  }
+
+  function staysHTML(d){
+    var sorted = d.stays.slice().sort(function(a,b){ return a.arrival<b.arrival?1:-1; });
+    var rows = sorted.map(function(s){
+      var nights = nightsBetween(s.arrival, s.departure);
+      return '<tr><td>'+esc(s.guestName)+'</td><td>'+fmtDate(s.arrival)+'</td><td>'+fmtDate(s.departure)+'</td><td>'+nights+'</td><td>'+s.guests+'</td>' +
+        '<td>'+trSource(s.source)+'</td><td><span class="status-pill status-'+s.status+'">'+trStatus(s.status)+'</span></td>' +
+        '<td class="row-actions"><button class="icon-btn" data-action="edit-stay" data-id="'+s.id+'">'+ICONS.edit+'</button>' +
+        '<button class="icon-btn" data-action="ask-delete-stay" data-id="'+s.id+'">'+ICONS.trash+'</button></td></tr>';
+    }).join("");
+
+    return '<div class="page-head"><div><h1 class="page-title">'+tr("stays_title")+'</h1><p class="page-sub">'+tr("stays_sub")+'</p></div>' +
+      '<button class="btn" data-action="new-stay">'+ICONS.plus+' '+tr("addStay")+'</button></div>' +
+      '<div class="table-wrap"><table><thead><tr><th>'+tr("thGuest")+'</th><th>'+tr("thArrival")+'</th><th>'+tr("thDeparture")+'</th><th>'+tr("thNights")+'</th><th>'+tr("thGuests")+'</th><th>'+tr("thSource")+'</th><th>'+tr("thStatus")+'</th><th></th></tr></thead><tbody>' +
+      (rows || '<tr><td colspan="8" class="empty">'+tr("noStays")+'</td></tr>') + '</tbody></table></div>';
+  }
+
+  function expensesHTML(d){
+    var monthKey = state.expensesMonth;
+    var monthExpenses = d.expenses.filter(function(e){ return monthKeyOf(e.date)===monthKey; }).sort(function(a,b){ return a.date<b.date?1:-1; });
+    var total = monthExpenses.reduce(function(s,e){ return s+e.amount; },0);
+    var byCategory = {};
+    monthExpenses.forEach(function(e){ byCategory[e.category] = (byCategory[e.category]||0)+e.amount; });
+    var bars = Object.keys(byCategory).sort(function(a,b){ return byCategory[b]-byCategory[a]; }).map(function(c){
+      var pct = total ? Math.round((byCategory[c]/total)*100) : 0;
+      return '<div class="cat-bar-row"><div class="cat-bar-top"><span>'+trCategory(c)+'</span><span>'+pct+'% · '+fmtAr(byCategory[c])+'</span></div>' +
+        '<div class="cat-bar-track"><div class="cat-bar-fill" style="width:'+pct+'%"></div></div></div>';
+    }).join("");
+
+    var rows = monthExpenses.map(function(e){
+      return '<tr><td>'+fmtDate(e.date)+'</td><td>'+esc(e.description)+'</td><td>'+trCategory(e.category)+'</td><td>'+esc(e.supplier||"—")+'</td><td>'+fmtAr(e.amount)+'</td>' +
+        '<td class="row-actions"><button class="icon-btn" data-action="edit-expense" data-id="'+e.id+'">'+ICONS.edit+'</button>' +
+        '<button class="icon-btn" data-action="ask-delete-expense" data-id="'+e.id+'">'+ICONS.trash+'</button></td></tr>';
+    }).join("");
+
+    return '<div class="page-head"><div><h1 class="page-title">'+tr("exp_title")+'</h1><p class="page-sub">'+tr("exp_sub")+'</p></div>' +
+      '<div style="display:flex;gap:10px;align-items:center"><input type="month" class="month-picker" id="expMonthInput" value="'+monthKey+'" />' +
+      '<button class="btn" data-action="new-expense">'+ICONS.plus+' '+tr("addExpense")+'</button></div></div>' +
+      '<div class="two-col">' +
+        '<div class="table-wrap"><table><thead><tr><th>'+tr("thDate")+'</th><th>'+tr("thDescription")+'</th><th>'+tr("thCategory")+'</th><th>'+tr("thSupplier")+'</th><th>'+tr("thAmount")+'</th><th></th></tr></thead><tbody>' +
+        (rows || '<tr><td colspan="6" class="empty">'+tr("noExpensesMonth")+'</td></tr>') +
+        '</tbody></table></div>' +
+        '<div>' +
+          '<div class="panel"><div class="panel-title">'+tr("totalMonthlyExpenses")+'</div><div class="stat-value">'+fmtAr(total)+'</div></div>' +
+          '<div class="panel"><div class="panel-title">'+tr("byCategory")+'</div>' + (bars || '<p class="empty">'+tr("noDataYet")+'</p>') + '</div>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function reportsHTML(d){
+    var monthKey = state.reportMonth;
+    var s = computeMonthStats(d, monthKey);
+    var monthLabel = tr("months")[s.m-1] + " " + s.y;
+    var catRows = Object.keys(s.byCategory).sort(function(a,b){ return s.byCategory[b]-s.byCategory[a]; })
+      .map(function(c){ return rowLine(trCategory(c), fmtAr(s.byCategory[c])); }).join("") || '<p class="empty">'+tr("noDataYet")+'</p>';
+
+    var summary = tr("reportSummary")(esc(d.residence.name), s.staysCount, s.nightsOccupied, s.occupancyRate, s.staysArriving.length, s.staysDeparting.length, fmtAr(s.totalExpenses), s.monthExpenses.length, s.highestCategory?trCategory(s.highestCategory):null);
+
+    var notes = (d.monthlyNotes && d.monthlyNotes[monthKey]) || "";
+
+    var monthSet = {};
+    d.stays.forEach(function(st){ monthSet[monthKeyOf(st.arrival)] = true; });
+    d.expenses.forEach(function(e){ monthSet[monthKeyOf(e.date)] = true; });
+    var months = Object.keys(monthSet).sort();
+    var histRows = months.map(function(mk){
+      var st = computeMonthStats(d, mk);
+      var lbl = tr("months")[st.m-1].slice(0,3) + " " + st.y;
+      return '<tr><td>'+lbl+'</td><td>'+st.nightsOccupied+'</td><td>'+st.staysCount+'</td><td>'+fmtAr(st.totalExpenses)+'</td>' +
+        '<td><button class="btn secondary small" data-action="open-report" data-month="'+mk+'">'+tr("reportBtn")+'</button></td></tr>';
+    }).join("");
+
+    return '<div class="page-head"><div><h1 class="page-title">'+tr("rep_title")+'</h1><p class="page-sub">'+tr("rep_sub")+'</p></div>' +
+      '<div style="display:flex;gap:10px" class="no-print"><input type="month" class="month-picker" id="reportMonthInput" value="'+monthKey+'" />' +
+      '<button class="btn secondary" data-action="print-report">'+ICONS.print+' '+tr("printExport")+'</button></div></div>' +
+      '<div id="reportPrintArea">' +
+        '<div class="panel">' +
+          '<div style="text-align:center;margin-bottom:6px">' +
+            '<div style="font-family:\'Cormorant Garamond\',serif;font-size:22px;font-weight:600">'+esc(d.residence.name.toUpperCase())+'</div>' +
+            '<div style="font-size:11px;letter-spacing:0.1em;color:var(--muted)">'+esc((d.residence.subtitle||"").toUpperCase())+'</div>' +
+            '<div style="font-size:12px;color:var(--muted);margin-top:10px;letter-spacing:0.06em">'+tr("docHeader")+'</div>' +
+            '<div style="font-family:\'Cormorant Garamond\',serif;font-size:19px;margin-top:2px">'+monthLabel+'</div>' +
+          '</div>' +
+          '<div class="report-block-title">'+tr("secOccupancy")+'</div>' +
+          rowLine(tr("totalStays"), s.staysCount) + rowLine(tr("totalNights"), s.nightsOccupied) +
+          rowLine(tr("occupancyRate"), s.occupancyRate+"%") + rowLine(tr("arrivals"), s.staysArriving.length) + rowLine(tr("departures"), s.staysDeparting.length) +
+          '<div class="report-block-title">'+tr("secExpenses")+'</div>' +
+          rowLine(tr("totalExpenses"), fmtAr(s.totalExpenses)) + rowLine(tr("numExpenses"), s.monthExpenses.length) +
+          rowLine(tr("highestCategory"), s.highestCategory?trCategory(s.highestCategory):"—") +
+          '<div style="margin-top:10px">' + catRows + '</div>' +
+          '<div class="report-block-title">'+tr("secSummary")+'</div>' +
+          '<div class="summary-text">' + summary + '</div>' +
+          '<div class="report-block-title">'+tr("secNotes")+'</div>' +
+          '<textarea id="reportNotes" rows="4" placeholder="'+tr("notesPlaceholder")+'">'+esc(notes)+'</textarea>' +
+        '</div>' +
+      '</div>' +
+      '<div class="panel no-print"><div class="panel-title">'+tr("monthlyHistory")+'</div>' +
+      '<div class="table-wrap"><table><thead><tr><th>'+tr("thMonth")+'</th><th>'+tr("thNights")+'</th><th>'+tr("thStaysCol")+'</th><th>'+tr("thExpensesCol")+'</th><th></th></tr></thead><tbody>' +
+      (histRows || '<tr><td colspan="5" class="empty">'+tr("noHistory")+'</td></tr>') + '</tbody></table></div></div>';
+  }
+
+  function settingsHTML(d){
+    var catChips = d.categories.map(function(c){ return '<span class="chip">'+trCategory(c)+'<button data-action="remove-category" data-cat="'+esc(c)+'">'+ICONS.x+'</button></span>'; }).join("");
+    return '<div class="page-head"><div><h1 class="page-title">'+tr("set_title")+'</h1><p class="page-sub">'+tr("set_sub")+'</p></div></div>' +
+      '<div class="settings-section panel"><div class="panel-title">'+tr("residence")+'</div>' +
+        '<div class="form-grid">' +
+          '<label class="field">'+tr("name")+'<input type="text" id="settName" value="'+esc(d.residence.name)+'" /></label>' +
+          '<label class="field">'+tr("subtitle")+'<input type="text" id="settSubtitle" value="'+esc(d.residence.subtitle||"")+'" /></label>' +
+        '</div>' +
+        '<button class="btn secondary small" data-action="save-residence">'+tr("save")+'</button>' +
+      '</div>' +
+      '<div class="settings-section panel"><div class="panel-title">'+tr("expenseCategories")+'</div>' +
+        '<div class="chip-list">'+catChips+'</div>' +
+        '<form class="inline-add" data-form="category"><input type="text" name="cat" placeholder="'+tr("newCategoryName")+'" required />' +
+        '<button class="btn secondary small" type="submit">'+ICONS.plus+' '+tr("add")+'</button></form>' +
+      '</div>' +
+      '<div class="settings-section panel"><div class="panel-title">'+tr("dataSection")+'</div>' +
+        '<p class="empty" style="margin-bottom:12px">'+tr("dataDesc")+'</p>' +
+        '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
+          '<button class="btn secondary small" data-action="export-data">'+ICONS.download+' '+tr("exportData")+'</button>' +
+          '<label class="btn secondary small" style="cursor:pointer">'+ICONS.upload+' '+tr("importData")+'<input type="file" id="importFile" accept="application/json" style="display:none" /></label>' +
+          '<button class="btn danger small" data-action="clear-demo">'+tr("removeDemoData")+'</button>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function modalHTML(d){
+    if (state.modal.type==="stay"){
+      var editing = state.modal.editId ? d.stays.find(function(s){ return s.id===state.modal.editId; }) : null;
+      var srcOpts = BOOKING_SOURCES.map(function(o){ return '<option value="'+o+'"'+(editing&&editing.source===o?' selected':'')+'>'+trSource(o)+'</option>'; }).join("");
+      var statOpts = STAY_STATUSES.map(function(o){ return '<option value="'+o+'"'+(editing&&editing.status===o?' selected':'')+'>'+trStatus(o)+'</option>'; }).join("");
+      var arr = editing?editing.arrival:todayISO();
+      var dep = editing?editing.departure:todayISO();
+      return '<div class="modal-overlay" id="modalOverlay"><div class="modal-box">' +
+        '<div class="modal-head"><h3>'+(editing?tr("modalEditStay"):tr("modalAddStay"))+'</h3><button class="icon-btn" id="modalClose">'+ICONS.x+'</button></div>' +
+        '<form id="stayForm" data-form="stay">' +
+          '<input type="hidden" name="id" value="'+(editing?editing.id:"")+'" />' +
+          '<div class="form-grid single"><label class="field">'+tr("guestName")+'<input type="text" name="guestName" value="'+(editing?esc(editing.guestName):"")+'" required /></label></div>' +
+          '<div class="form-grid">' +
+            '<label class="field">'+tr("arrivalDate")+'<input type="date" name="arrival" id="stayArrival" value="'+arr+'" required /></label>' +
+            '<label class="field">'+tr("departureDate")+'<input type="date" name="departure" id="stayDeparture" value="'+dep+'" required /></label>' +
+          '</div>' +
+          '<div id="nightsPreview" class="nights-preview">'+tr("nights")(nightsBetween(arr,dep))+'</div>' +
+          '<div class="form-grid">' +
+            '<label class="field">'+tr("numberOfGuests")+'<input type="number" name="guests" min="1" value="'+(editing?editing.guests:1)+'" required /></label>' +
+            '<label class="field">'+tr("bookingSource")+'<select name="source">'+srcOpts+'</select></label>' +
+          '</div>' +
+          '<div class="form-grid"><label class="field">'+tr("status")+'<select name="status">'+statOpts+'</select></label></div>' +
+          '<div class="form-grid single"><label class="field">'+tr("notes")+'<textarea name="notes">'+(editing?esc(editing.notes||""):"")+'</textarea></label></div>' +
+          '<div class="modal-actions"><button type="button" class="btn secondary" id="modalCancel">'+tr("cancel")+'</button><button type="submit" class="btn">'+(editing?tr("saveChanges"):tr("addStay"))+'</button></div>' +
+        '</form>' +
+      '</div></div>';
+    }
+    if (state.modal.type==="expense"){
+      var e = state.modal.editId ? d.expenses.find(function(x){ return x.id===state.modal.editId; }) : null;
+      var catOpts = d.categories.map(function(c){ return '<option value="'+esc(c)+'"'+(e&&e.category===c?' selected':'')+'>'+trCategory(c)+'</option>'; }).join("");
+      var payOpts = PAYMENT_METHODS.map(function(p){ return '<option value="'+p+'"'+(e&&e.paymentMethod===p?' selected':'')+'>'+trPayment(p)+'</option>'; }).join("");
+      return '<div class="modal-overlay" id="modalOverlay"><div class="modal-box">' +
+        '<div class="modal-head"><h3>'+(e?tr("modalEditExpense"):tr("modalAddExpense"))+'</h3><button class="icon-btn" id="modalClose">'+ICONS.x+'</button></div>' +
+        '<form id="expenseForm" data-form="expense">' +
+          '<input type="hidden" name="id" value="'+(e?e.id:"")+'" />' +
+          '<div class="form-grid">' +
+            '<label class="field">'+tr("thDate")+'<input type="date" name="date" value="'+(e?e.date:todayISO())+'" required /></label>' +
+            '<label class="field">'+tr("amountAr")+'<input type="number" name="amount" min="0" value="'+(e?e.amount:"")+'" required /></label>' +
+          '</div>' +
+          '<div class="form-grid single"><label class="field">'+tr("description")+'<input type="text" name="description" value="'+(e?esc(e.description):"")+'" required /></label></div>' +
+          '<div class="form-grid">' +
+            '<label class="field">'+tr("category")+'<select name="category">'+catOpts+'</select></label>' +
+            '<label class="field">'+tr("paymentMethod")+'<select name="paymentMethod">'+payOpts+'</select></label>' +
+          '</div>' +
+          '<div class="form-grid single"><label class="field">'+tr("supplier")+'<input type="text" name="supplier" value="'+(e?esc(e.supplier||""):"")+'" /></label></div>' +
+          '<div class="form-grid single"><label class="field">'+tr("notes")+'<textarea name="notes">'+(e?esc(e.notes||""):"")+'</textarea></label></div>' +
+          '<div class="modal-actions"><button type="button" class="btn secondary" id="modalCancel">'+tr("cancel")+'</button><button type="submit" class="btn">'+(e?tr("saveChanges"):tr("addExpense"))+'</button></div>' +
+        '</form>' +
+      '</div></div>';
+    }
+    return "";
+  }
+  function bindModal(d){
+    var overlay = document.getElementById("modalOverlay");
+    overlay.addEventListener("click", function(e2){ if(e2.target.id==="modalOverlay") closeModal(); });
+    document.getElementById("modalClose").addEventListener("click", closeModal);
+    var cancelBtn = document.getElementById("modalCancel");
+    if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
+
+    if (state.modal.type==="stay"){
+      var arrEl = document.getElementById("stayArrival"), depEl = document.getElementById("stayDeparture");
+      function updatePreview(){ document.getElementById("nightsPreview").textContent = tr("nights")(nightsBetween(arrEl.value, depEl.value)); }
+      arrEl.addEventListener("change", updatePreview);
+      depEl.addEventListener("change", updatePreview);
+    }
+  }
+  function closeModal(){ state.modal = null; render(); }
+
+  function confirmHTML(){
+    return '<div class="modal-overlay" id="confirmOverlay"><div class="modal-box" style="width:340px">' +
+      '<div class="modal-head"><h3>'+tr("confirmDeleteTitle")+'</h3></div>' +
+      '<p class="empty" style="margin-bottom:16px">'+tr("confirmDeleteBody")+'</p>' +
+      '<div class="modal-actions"><button class="btn secondary" id="confirmCancel">'+tr("cancel")+'</button><button class="btn danger" id="confirmOk">'+tr("delete")+'</button></div>' +
+    '</div></div>';
+  }
+  function bindConfirm(){
+    document.getElementById("confirmCancel").addEventListener("click", function(){ state.confirmAction=null; render(); });
+    document.getElementById("confirmOk").addEventListener("click", function(){
+      var action = state.confirmAction;
+      state.confirmAction = null;
+      if (action.type==="delete-stay") update({ stays: state.data.stays.filter(function(s){ return s.id!==action.id; }) });
+      else if (action.type==="delete-expense") update({ expenses: state.data.expenses.filter(function(e){ return e.id!==action.id; }) });
+      else render();
+    });
+  }
+
+  root.addEventListener("click", function(e){
+    var el = e.target.closest("[data-action]");
+    if (!el) return;
+    var d = state.data;
+    var action = el.getAttribute("data-action");
+    var id = el.getAttribute("data-id");
+
+    if (action==="tab"){ state.tab = el.getAttribute("data-tab"); state.selectedDay=null; render(); }
+    else if (action==="lang"){ state.lang = el.getAttribute("data-lang"); saveLang(); render(); }
+    else if (action==="cal-prev"){ var p=state.calendarMonth.split("-"); var dt=new Date(Number(p[0]),Number(p[1])-2,1); state.calendarMonth=dt.getFullYear()+"-"+pad2(dt.getMonth()+1); render(); }
+    else if (action==="cal-next"){ var p2=state.calendarMonth.split("-"); var dt2=new Date(Number(p2[0]),Number(p2[1]),1); state.calendarMonth=dt2.getFullYear()+"-"+pad2(dt2.getMonth()+1); render(); }
+    else if (action==="cal-today"){ state.calendarMonth = todayISO().slice(0,7); state.selectedDay = todayISO(); render(); }
+    else if (action==="pick-day"){ state.selectedDay = el.getAttribute("data-date"); render(); }
+    else if (action==="new-stay"){ state.modal = { type:"stay", editId:null }; render(); }
+    else if (action==="edit-stay"){ state.modal = { type:"stay", editId:id }; render(); }
+    else if (action==="ask-delete-stay"){ state.confirmAction = { type:"delete-stay", id:id }; render(); }
+    else if (action==="new-expense"){ state.modal = { type:"expense", editId:null }; render(); }
+    else if (action==="edit-expense"){ state.modal = { type:"expense", editId:id }; render(); }
+    else if (action==="ask-delete-expense"){ state.confirmAction = { type:"delete-expense", id:id }; render(); }
+    else if (action==="open-report"){ state.reportMonth = el.getAttribute("data-month"); state.tab="reports"; render(); }
+    else if (action==="print-report"){ window.print(); }
+    else if (action==="clear-demo"){
+      update({ stays: d.stays.filter(function(s){ return !s.isDemo; }), expenses: d.expenses.filter(function(e){ return !e.isDemo; }) });
+    }
+    else if (action==="save-residence"){
+      var name = document.getElementById("settName").value.trim() || d.residence.name;
+      var sub = document.getElementById("settSubtitle").value.trim();
+      update({ residence: { name:name, subtitle:sub } });
+    }
+    else if (action==="remove-category"){
+      var cat = el.getAttribute("data-cat");
+      update({ categories: d.categories.filter(function(c){ return c!==cat; }) });
+    }
+    else if (action==="export-data"){
+      var blob = new Blob([JSON.stringify(d,null,2)], {type:"application/json"});
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url; a.download = "masoandro-p8-backup-"+todayISO()+".json";
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  });
+
+  root.addEventListener("change", function(e){
+    var el = e.target;
+    if (el.id==="reportMonthInput"){ state.reportMonth = el.value; render(); }
+    else if (el.id==="expMonthInput"){ state.expensesMonth = el.value; render(); }
+    else if (el.id==="importFile"){
+      var file = el.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(){
+        try {
+          var parsed = JSON.parse(reader.result);
+          if (!parsed.stays || !parsed.expenses) throw new Error("invalid");
+          state.data = parsed;
+          if (!state.data.categories) state.data.categories = EXPENSE_CATEGORIES_DEFAULT.slice();
+          if (!state.data.monthlyNotes) state.data.monthlyNotes = {};
+          save(); render();
+        } catch(err){ alert(tr("importInvalid")); }
+      };
+      reader.readAsText(file);
+    }
+    else if (el.id==="reportNotes"){
+      var notes = Object.assign({}, state.data.monthlyNotes);
+      notes[state.reportMonth] = el.value;
+      update({ monthlyNotes: notes });
+    }
+  });
+
+  root.addEventListener("submit", function(e){
+    var form = e.target.closest("[data-form]");
+    if (!form) return;
+    e.preventDefault();
+    var type = form.getAttribute("data-form");
+    var d = state.data;
+    var fd = new FormData(form);
+
+    if (type==="stay"){
+      var id = fd.get("id");
+      var payload = {
+        guestName: fd.get("guestName"), arrival: fd.get("arrival"), departure: fd.get("departure"),
+        guests: Number(fd.get("guests"))||1, source: fd.get("source"), status: fd.get("status"), notes: fd.get("notes")
+      };
+      if (id){
+        update({ stays: d.stays.map(function(s){ return s.id===id ? Object.assign({},s,payload) : s; }) });
+      } else {
+        update({ stays: [Object.assign({id:uid(), isDemo:false}, payload)].concat(d.stays) });
+      }
+      state.modal = null; render();
+    }
+    else if (type==="expense"){
+      var eid = fd.get("id");
+      var payload2 = {
+        date: fd.get("date"), amount: Number(fd.get("amount"))||0, description: fd.get("description"),
+        category: fd.get("category"), paymentMethod: fd.get("paymentMethod"), supplier: fd.get("supplier"), notes: fd.get("notes")
+      };
+      if (eid){
+        update({ expenses: d.expenses.map(function(e2){ return e2.id===eid ? Object.assign({},e2,payload2) : e2; }) });
+      } else {
+        update({ expenses: [Object.assign({id:uid(), isDemo:false}, payload2)].concat(d.expenses) });
+      }
+      state.modal = null; render();
+    }
+    else if (type==="category"){
+      var cat = (fd.get("cat")||"").trim();
+      if (cat && d.categories.indexOf(cat)===-1) update({ categories: d.categories.concat([cat]) });
+      form.reset();
+    }
+  });
+
+  loadData();
+})();
+</script>
+</body>
+</html>

@@ -869,6 +869,14 @@
     var catRows = Object.keys(s.byCategory).sort(function(a,b){ return s.byCategory[b]-s.byCategory[a]; })
       .map(function(c){ return rowLine(trCategory(c), fmtAr(s.byCategory[c])); }).join("") || '<p class="empty">'+tr("noDataYet")+'</p>';
 
+    var sortedExpenses = s.monthExpenses.slice().sort(function(a,b){ return a.date<b.date?-1:1; });
+    var expenseRows = sortedExpenses.map(function(e){
+      return '<tr><td>'+fmtDate(e.date)+'</td><td>'+esc(e.description)+'</td><td>'+trCategory(e.category)+'</td><td>'+esc(e.supplier||"—")+'</td><td style="text-align:right">'+fmtAr(e.amount)+'</td></tr>';
+    }).join("");
+    var expenseTable = '<div class="table-wrap" style="margin-top:10px"><table><thead><tr><th>'+tr("thDate")+'</th><th>'+tr("thDescription")+'</th><th>'+tr("thCategory")+'</th><th>'+tr("thSupplier")+'</th><th style="text-align:right">'+tr("thAmount")+'</th></tr></thead><tbody>' +
+      (expenseRows || '<tr><td colspan="5" class="empty">'+tr("noExpensesMonth")+'</td></tr>') +
+      '</tbody><tfoot><tr><td colspan="4" style="text-align:right;font-weight:700">'+tr("totalExpenses")+'</td><td style="text-align:right;font-weight:700">'+fmtAr(s.totalExpenses)+'</td></tr></tfoot></table></div>';
+
     var summary = tr("reportSummary")(esc(d.residence.name), s.staysCount, s.nightsOccupied, s.occupancyRate, s.staysArriving.length, s.staysDeparting.length, fmtAr(s.totalExpenses), s.monthExpenses.length, s.highestCategory?trCategory(s.highestCategory):null);
 
     var notes = (d.monthlyNotes && d.monthlyNotes[monthKey]) || "";
@@ -901,7 +909,10 @@
           '<div class="report-block-title">'+tr("secExpenses")+'</div>' +
           rowLine(tr("totalExpenses"), fmtAr(s.totalExpenses)) + rowLine(tr("numExpenses"), s.monthExpenses.length) +
           rowLine(tr("highestCategory"), s.highestCategory?trCategory(s.highestCategory):"—") +
-          '<div style="margin-top:10px">' + catRows + '</div>' +
+          '<div style="margin-top:14px;font-size:11px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--muted)">'+tr("byCategory")+'</div>' +
+          '<div style="margin-top:6px">' + catRows + '</div>' +
+          '<div style="margin-top:14px;font-size:11px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--muted)">'+tr("thExpensesCol")+'</div>' +
+          expenseTable +
           '<div class="report-block-title">'+tr("secSummary")+'</div>' +
           '<div class="summary-text">' + summary + '</div>' +
           '<div class="report-block-title">'+tr("secNotes")+'</div>' +
